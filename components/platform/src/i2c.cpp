@@ -58,9 +58,9 @@ bool EspI2cDevice::read(std::span<std::uint8_t> bytes) noexcept {
                                          bytes.data(), bytes.size(), timeout_ms_) == ESP_OK;
 }
 
-void FreeRtosDelay::sleep_for(domain::Milliseconds duration) noexcept {
-    if (duration > 0) {
-        vTaskDelay(pdMS_TO_TICKS(duration) + 1);
+void FreeRtosDelay::sleep_for(std::int64_t duration_ms) noexcept {
+    if (duration_ms > 0) {
+        vTaskDelay(pdMS_TO_TICKS(duration_ms) + 1);
     }
 }
 

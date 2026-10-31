@@ -1,6 +1,7 @@
 #include "device.hpp"
 
 #include "application/command_path.hpp"
+#include "application/telemetry_codec.hpp"
 #include "application/workers.hpp"
 #include "boards/esp32s3/board_config.hpp"
 #include "configuration/nvs_config_store.hpp"
@@ -14,13 +15,15 @@
 #include "networking/sntp_time.hpp"
 #include "networking/wifi_station.hpp"
 #include "platform/clock.hpp"
-#include "platform/command_queue.hpp"
 #include "platform/i2c.hpp"
-#include "platform/log_telemetry.hpp"
 #include "platform/periodic_task.hpp"
-#include "platform/snapshot.hpp"
+#include "wiring/fifo.hpp"
+#include "wiring/log_telemetry.hpp"
+#include "wiring/snapshot.hpp"
 
+#include <array>
 #include <cstdlib>
+#include <span>
 
 namespace device {
 
@@ -34,16 +37,68 @@ constexpr bool remote_commands_enabled = true;
 constexpr bool remote_commands_enabled = false;
 #endif
 
+class DeviceClock final : public application::Clock, public networking::SteadyTime {
+    public:
+    std::int64_t now() const noexcept override {
+        return clock_.now();
+    }
+
+    private:
+    platform::EspClock clock_;
+};
+
+class BoardBus final : public drivers::I2cBus {
+    public:
+    bool begin(int sda, int scl, unsigned address, unsigned clock_hz, int timeout_ms) noexcept {
+        return device_.begin(sda, scl, address, clock_hz, timeout_ms);
+    }
+
+    bool write(std::span<const std::uint8_t> bytes) noexcept override {
+        return device_.write(bytes);
+    }
+
+    bool read(std::span<std::uint8_t> bytes) noexcept override {
+        return device_.read(bytes);
+    }
+
+    private:
+    platform::EspI2cDevice device_;
+};
+
+class BoardDelay final : public drivers::Delay {
+    public:
+    void sleep_for(std::int64_t duration_ms) noexcept override {
+        platform::FreeRtosDelay::sleep_for(duration_ms);
+    }
+};
+
+class Sht3xSource final : public app::SensorSource {
+    public:
+    explicit Sht3xSource(drivers::Sht3xSensor& sensor) noexcept : sensor_(sensor) {
+    }
+
+    domain::Reading read(domain::Milliseconds now) noexcept override {
+        const auto sample = sensor_.measure();
+        return {sample.temperature_celsius, now, sample.valid, domain::MeasurementUnit::celsius,
+                domain::DataOrigin::physical};
+    }
+
+    private:
+    drivers::Sht3xSensor& sensor_;
+};
+
 class CombinedReporter final : public app::TelemetrySink {
     public:
-    CombinedReporter(app::TelemetrySink& log, app::TelemetrySink& network,
+    CombinedReporter(app::TelemetrySink& log, networking::NetworkService& network,
                      app::BoundedFifo<domain::CommandResult>& results)
         : log_(log), network_(network), results_(results) {
     }
 
     void report(const domain::Telemetry& status) noexcept override {
         log_.report(status);
-        network_.report(status);
+        std::array<char, app::telemetry_payload_capacity> payload{};
+        const auto length = app::encode_telemetry(status, payload);
+        network_.forward(std::span<const char>(payload.data(), length));
         domain::CommandResult result{};
         while (results_.try_pop(result)) {
             ESP_LOGI("commands", "id=%llu sequence=%u source=%d type=%d status=%d",
@@ -55,7 +110,7 @@ class CombinedReporter final : public app::TelemetrySink {
 
     private:
     app::TelemetrySink& log_;
-    app::TelemetrySink& network_;
+    networking::NetworkService& network_;
     app::BoundedFifo<domain::CommandResult>& results_;
 };
 
@@ -117,26 +172,26 @@ class DeviceRuntime {
     }
 
     private:
-    platform::EspClock clock_;
-    platform::FreeRtosSnapshot<domain::Reading> readings_;
-    platform::FreeRtosSnapshot<domain::Telemetry> telemetry_;
-    platform::FreeRtosFifo<app::QueuedCommand> commands_{defaults::command_queue_capacity};
-    platform::FreeRtosFifo<domain::CommandResult> command_results_{
-        defaults::command_result_capacity};
-    platform::FreeRtosSnapshot<app::StopNotice> stops_;
+    DeviceClock clock_;
+    wiring::Snapshot<domain::Reading> readings_;
+    wiring::Snapshot<domain::Telemetry> telemetry_;
+    wiring::Fifo<app::QueuedCommand> commands_{defaults::command_queue_capacity};
+    wiring::Fifo<domain::CommandResult> command_results_{defaults::command_result_capacity};
+    wiring::Snapshot<app::StopNotice> stops_;
     app::CommandIngress ingress_{commands_, command_results_, stops_, defaults::command_limits,
                                  remote_commands_enabled};
 #if CONFIG_ESPKIT_SENSOR_SHT3X
-    platform::EspI2cDevice bus_;
-    platform::FreeRtosDelay delay_;
-    drivers::Sht3xSensor sensor_{bus_, delay_};
+    BoardBus bus_;
+    BoardDelay delay_;
+    drivers::Sht3xSensor sht_{bus_, delay_};
+    Sht3xSource sensor_{sht_};
 #else
     drivers::SyntheticSensor sensor_{defaults::synthetic_reading};
 #endif
     drivers::SimulatedOutput output_;
     app::CommandRequests requests_{commands_, command_results_, stops_,
                                    defaults::output_policy.max_run_ms};
-    platform::LogTelemetry log_{"simulated"};
+    wiring::LogTelemetry log_{"simulated"};
     networking::WifiStation wifi_{clock_};
     networking::MqttTelemetry mqtt_;
     networking::SntpTime network_time_;
@@ -146,14 +201,14 @@ class DeviceRuntime {
     app::SensorWorker sensor_worker_;
     app::ControlWorker control_worker_;
     app::ReporterWorker reporter_worker_;
-    platform::PeriodicTask sensor_task_;
-    platform::PeriodicTask control_task_;
-    platform::PeriodicTask reporter_task_;
+    platform::PeriodicTask<app::SensorWorker> sensor_task_;
+    platform::PeriodicTask<app::ControlWorker> control_task_;
+    platform::PeriodicTask<app::ReporterWorker> reporter_task_;
 #if CONFIG_ESPKIT_NETWORK_ENABLED
-    platform::PeriodicTask network_task_{network_,
-                                         {"network", device::defaults::network_stack_bytes,
-                                          device::defaults::network_priority,
-                                          defaults::network_period_ms}};
+    platform::PeriodicTask<networking::NetworkService> network_task_{
+        network_,
+        {"network", device::defaults::network_stack_bytes, device::defaults::network_priority,
+         defaults::network_period_ms}};
 #endif
     bool started_{false};
 };

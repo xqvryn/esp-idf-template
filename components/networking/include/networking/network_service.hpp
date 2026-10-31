@@ -1,14 +1,17 @@
 #pragma once
 
-#include "domain/types.hpp"
 #include "networking/connections.hpp"
+#include "networking/steady_time.hpp"
+
+#include <cstdint>
+#include <span>
 
 namespace networking {
 
 // How long step() waits before repeating a failed start.
 // Link loss after a successful start uses WifiStation's own backoff instead.
 // waiting_for_time also uses this as the length of one SNTP session.
-inline constexpr domain::Milliseconds network_init_retry_ms = 5000;
+inline constexpr std::int64_t network_init_retry_ms = 5000;
 
 // SNTP sessions waiting_for_time may start before the bring-up fails like a
 // Wi-Fi start. The first expiry stops SNTP and begins again. The next expiry
@@ -37,10 +40,9 @@ enum class NetworkState {
 // the only caller of configure, start, stop, step, and state. configure from
 // stopped replaces the owned copy and does not write NVS. stop() does not read
 // sensors or change outputs; control keeps running on its own task.
-class NetworkService final : public application::Work, public application::TelemetrySink {
+class NetworkService final {
     public:
-    NetworkService(WifiConnection& wifi, MqttConnection& mqtt, NetworkTime& time,
-                   application::Clock& clock)
+    NetworkService(WifiConnection& wifi, MqttConnection& mqtt, NetworkTime& time, SteadyTime& clock)
         : wifi_(wifi), mqtt_(mqtt), time_(time), clock_(clock) {
     }
 
@@ -53,8 +55,9 @@ class NetworkService final : public application::Work, public application::Telem
     void start() noexcept;
     // Synchronous release in connection_stop_order. Repeated calls are safe.
     void stop() noexcept;
-    void step() noexcept override;
-    void report(const domain::Telemetry& status) noexcept override;
+    void step() noexcept;
+    // Drops an empty payload. Forwards only while the station link is up.
+    void forward(std::span<const char> payload) noexcept;
 
     // Network-worker inspection only.
     NetworkState state() const noexcept {
@@ -71,14 +74,14 @@ class NetworkService final : public application::Work, public application::Telem
     WifiConnection& wifi_;
     MqttConnection& mqtt_;
     NetworkTime& time_;
-    application::Clock& clock_;
+    SteadyTime& clock_;
     configuration::NetworkConfig config_{};
     NetworkState state_{NetworkState::disabled};
     bool needs_time_{false};
-    domain::Milliseconds retry_not_before_{0};
+    std::int64_t retry_not_before_{0};
     bool time_wait_armed_{false};
     int time_sessions_completed_{0};
-    domain::Milliseconds time_deadline_{0};
+    std::int64_t time_deadline_{0};
 };
 
 } // namespace networking

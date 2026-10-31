@@ -1,6 +1,5 @@
 #pragma once
 
-#include "application/ports/command.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
@@ -12,7 +11,7 @@ namespace platform {
 
 // Bounded command FIFO. A full queue rejects the new item; it does not overwrite.
 // Do not call from an interrupt. Latest-value mailboxes remain FreeRtosSnapshot.
-template <typename T> class FreeRtosFifo final : public application::BoundedFifo<T> {
+template <typename T> class FreeRtosFifo final {
     static_assert(std::is_trivially_copyable_v<T>);
 
     public:
@@ -25,7 +24,7 @@ template <typename T> class FreeRtosFifo final : public application::BoundedFifo
         queue_ = xQueueCreate(static_cast<UBaseType_t>(capacity_), sizeof(T));
     }
 
-    ~FreeRtosFifo() override {
+    ~FreeRtosFifo() {
         if (queue_) {
             vQueueDelete(queue_);
         }
@@ -38,19 +37,19 @@ template <typename T> class FreeRtosFifo final : public application::BoundedFifo
         return queue_ != nullptr;
     }
 
-    bool try_push(const T& value) noexcept override {
+    bool try_push(const T& value) noexcept {
         return queue_ && xQueueSend(queue_, &value, 0) == pdPASS;
     }
 
-    bool try_pop(T& value) noexcept override {
+    bool try_pop(T& value) noexcept {
         return queue_ && xQueueReceive(queue_, &value, 0) == pdTRUE;
     }
 
-    std::size_t size() const noexcept override {
+    std::size_t size() const noexcept {
         return queue_ ? static_cast<std::size_t>(uxQueueMessagesWaiting(queue_)) : 0;
     }
 
-    std::size_t capacity() const noexcept override {
+    std::size_t capacity() const noexcept {
         return queue_ ? capacity_ : 0;
     }
 

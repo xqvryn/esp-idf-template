@@ -1,7 +1,8 @@
+#include "application/command_envelope.hpp"
 #include "application/command_path.hpp"
+#include "application/telemetry_codec.hpp"
 #include "configuration/network_config.hpp"
 #include "domain/policy_defaults.hpp"
-#include "networking/command_envelope.hpp"
 #include "networking/telemetry.hpp"
 
 #include <array>
@@ -63,7 +64,7 @@ TEST(TelemetryEncoding, CarriesMeasurementUnitTimestampAndFault) {
                              domain::OutputError::none,
                              {25.5F, 900, true, domain::MeasurementUnit::celsius}};
     std::array<char, 512> buffer{};
-    const auto size = networking::encode_telemetry(status, buffer);
+    const auto size = application::encode_telemetry(status, buffer);
     ASSERT_GT(size, 0U);
     const std::string_view json(buffer.data(), size);
     EXPECT_NE(json.find("\"value\":25.500"), json.npos);
@@ -80,11 +81,11 @@ TEST(TelemetryEncoding, InvalidNumbersBecomeNullAndSmallBuffersFail) {
                              domain::OutputError::hardware_fault,
                              {std::numeric_limits<float>::quiet_NaN(), 900, true}};
     std::array<char, 512> buffer{};
-    ASSERT_GT(networking::encode_telemetry(status, buffer), 0U);
+    ASSERT_GT(application::encode_telemetry(status, buffer), 0U);
     EXPECT_NE(std::string_view(buffer.data()).find("\"value\":null"), std::string_view::npos);
     EXPECT_NE(std::string_view(buffer.data()).find("\"valid\":false"), std::string_view::npos);
     std::array<char, 8> small{};
-    EXPECT_EQ(networking::encode_telemetry(status, small), 0U);
+    EXPECT_EQ(application::encode_telemetry(status, small), 0U);
 }
 
 template <typename T>
@@ -180,19 +181,19 @@ void expect_untouched(const EnvelopePath<Commands, Results>& path) {
 }
 
 template <std::size_t Commands, std::size_t Results>
-networking::CommandEnvelopeResult decode(EnvelopePath<Commands, Results>& path,
-                                         std::string_view payload, domain::Milliseconds offset = 0,
-                                         std::uint32_t sequence = 1, std::uint32_t identity = 7,
-                                         domain::Milliseconds now = k_now) {
-    return networking::decode_command_envelope(payload, now, offset, identity, sequence,
-                                               path.ingress);
+application::CommandEnvelopeResult decode(EnvelopePath<Commands, Results>& path,
+                                          std::string_view payload, domain::Milliseconds offset = 0,
+                                          std::uint32_t sequence = 1, std::uint32_t identity = 7,
+                                          domain::Milliseconds now = k_now) {
+    return application::decode_command_envelope(payload, now, offset, identity, sequence,
+                                                path.ingress);
 }
 
 TEST(CommandEnvelope, ConvertsWallClockAndSubmitsRemoteEnable) {
     EnvelopePath path;
     const auto payload = enable_payload("1970-01-01T02:46:45Z", "4999");
     const auto decoded = decode(path, payload, 1000);
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::submitted);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::submitted);
     EXPECT_EQ(decoded.admission, domain::CommandStatus::accepted);
 
     application::QueuedCommand queued{};
@@ -225,12 +226,12 @@ TEST(CommandEnvelope, AcceptsReorderedWhitespaceFractionalAndPaddedPayloads) {
         "schema_version" : 1
     })";
     std::string padded(pretty);
-    ASSERT_LT(padded.size(), networking::command_envelope_max_bytes);
-    padded.append(networking::command_envelope_max_bytes - padded.size(), ' ');
+    ASSERT_LT(padded.size(), application::command_envelope_max_bytes);
+    padded.append(application::command_envelope_max_bytes - padded.size(), ' ');
     padded.push_back('X');
-    const std::string_view exact(padded.data(), networking::command_envelope_max_bytes);
+    const std::string_view exact(padded.data(), application::command_envelope_max_bytes);
     const auto decoded = decode(path, exact, 0, 1, 7, 0);
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::submitted);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::submitted);
     EXPECT_EQ(decoded.admission, domain::CommandStatus::accepted);
     application::QueuedCommand queued{};
     ASSERT_TRUE(path.commands.try_pop(queued));
@@ -246,7 +247,7 @@ TEST(CommandEnvelope, SamplePayloadIsLimitedByDefaultRuntime) {
         R"({"schema_version":1,"command_id":"8f36a7b1","type":"set_output","enabled":true,"issued_at":"2026-10-25T03:00:00Z","expires_at":"2026-10-25T03:00:15Z","max_duration_ms":5000})";
     EnvelopePath rejected;
     const auto too_long = decode(rejected, sample, offset);
-    EXPECT_EQ(too_long.reason, networking::CommandEnvelopeReason::submitted);
+    EXPECT_EQ(too_long.reason, application::CommandEnvelopeReason::submitted);
     EXPECT_EQ(too_long.admission, domain::CommandStatus::rejected_invalid);
     EXPECT_EQ(rejected.commands.size(), 0U);
 
@@ -267,7 +268,7 @@ TEST(CommandEnvelope, StopBypassesTheCommandFifo) {
     const auto payload =
         R"({"schema_version":1,"command_id":"a1","type":"stop","issued_at":"1970-01-01T02:46:40Z","expires_at":"1970-01-01T02:46:45Z"})";
     const auto decoded = decode(path, payload);
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::submitted);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::submitted);
     EXPECT_EQ(decoded.admission, domain::CommandStatus::accepted);
     EXPECT_EQ(path.commands.size(), 0U);
     application::StopNotice notice{};
@@ -278,13 +279,13 @@ TEST(CommandEnvelope, StopBypassesTheCommandFifo) {
 }
 
 TEST(CommandEnvelope, RejectsOversizeMalformedUnknownVersionAndExpiredWithoutSubmit) {
-    EXPECT_EQ(networking::command_envelope_max_bytes, 512U);
+    EXPECT_EQ(application::command_envelope_max_bytes, 512U);
     EnvelopePath path;
     expect_untouched(path);
 
-    const std::string oversize(networking::command_envelope_max_bytes + 1, '{');
+    const std::string oversize(application::command_envelope_max_bytes + 1, '{');
     auto decoded = decode(path, oversize);
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::rejected_oversize);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::rejected_oversize);
     expect_untouched(path);
 
     for (
@@ -319,7 +320,8 @@ TEST(CommandEnvelope, RejectsOversizeMalformedUnknownVersionAndExpiredWithoutSub
          R"({"schema_version":1,"command_id":"1","type":"stop","issued_at":"1970-01-01T02:46:40Z","expires_at":"1969-12-31T23:59:59Z"})",
          R"({"schema_version":1,"command_id":"1","type":"stop","issued_at":"1970-01-01T02:46:40Z","expires_at":"1970-01-01T02:46:45.1234Z"})"}) {
         decoded = decode(path, payload);
-        EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::rejected_malformed) << payload;
+        EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::rejected_malformed)
+            << payload;
         expect_untouched(path);
     }
 
@@ -328,27 +330,27 @@ TEST(CommandEnvelope, RejectsOversizeMalformedUnknownVersionAndExpiredWithoutSub
     deep.append(8, '}');
     deep.push_back('}');
     decoded = decode(path, deep);
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::rejected_malformed);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::rejected_malformed);
     expect_untouched(path);
 
     for (const char* payload :
          {R"({"schema_version":0})", R"({"schema_version":2})", R"({"schema_version":-1})",
           R"({"schema_version":2,"command_id":5,"extra":{"ok":true}})"}) {
         decoded = decode(path, payload);
-        EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::rejected_unknown_version)
+        EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::rejected_unknown_version)
             << payload;
         expect_untouched(path);
     }
 
     decoded = decode(path, enable_payload("1970-01-01T02:46:40Z"));
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::rejected_expired);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::rejected_expired);
     expect_untouched(path);
     decoded = decode(path, enable_payload("1970-01-01T02:46:45Z"), 10005000);
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::rejected_expired);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::rejected_expired);
     expect_untouched(path);
     decoded = decode(path, enable_payload("1970-01-01T02:46:45Z"),
                      std::numeric_limits<domain::Milliseconds>::min());
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::rejected_malformed);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::rejected_malformed);
     expect_untouched(path);
 }
 
@@ -385,7 +387,7 @@ TEST(CommandEnvelope, RemoteAdmissionStaysOffUntilTheIngressAllowsIt) {
     const auto payload = enable_payload("1970-01-01T02:46:45Z");
     const auto decoded = decode(closed, payload);
     EXPECT_FALSE(closed.ingress.remote_commands_enabled());
-    EXPECT_EQ(decoded.reason, networking::CommandEnvelopeReason::submitted);
+    EXPECT_EQ(decoded.reason, application::CommandEnvelopeReason::submitted);
     EXPECT_EQ(decoded.admission, domain::CommandStatus::rejected_unauthorized);
     EXPECT_EQ(closed.commands.size(), 0U);
     domain::CommandResult result{};
@@ -399,7 +401,7 @@ TEST(CommandEnvelope, FullResultFifoRejectsNewEnableAndStillArmsStop) {
     domain::CommandResult filler{};
     ASSERT_TRUE(path.results.try_push(filler));
     const auto enable = decode(path, enable_payload("1970-01-01T02:46:45Z"));
-    EXPECT_EQ(enable.reason, networking::CommandEnvelopeReason::submitted);
+    EXPECT_EQ(enable.reason, application::CommandEnvelopeReason::submitted);
     EXPECT_EQ(enable.admission, domain::CommandStatus::rejected_full);
     EXPECT_EQ(path.commands.size(), 0U);
     EXPECT_EQ(path.ingress.dropped_results(), 1U);

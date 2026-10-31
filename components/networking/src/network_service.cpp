@@ -144,12 +144,12 @@ void NetworkService::step() noexcept {
     state_ = NetworkState::running;
 }
 
-void NetworkService::report(const domain::Telemetry& status) noexcept {
-    if (wifi_.connected()) {
-        mqtt_.report(status);
-    } else {
+void NetworkService::forward(std::span<const char> payload) noexcept {
+    if (payload.empty() || !wifi_.connected()) {
         mqtt_.drop_report();
+        return;
     }
+    mqtt_.publish(payload);
 }
 
 } // namespace networking

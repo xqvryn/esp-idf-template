@@ -4,8 +4,8 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "platform/clock.hpp"
-#include "platform/snapshot.hpp"
+#include "wiring/clock.hpp"
+#include "wiring/snapshot.hpp"
 
 #include <cstdlib>
 
@@ -27,12 +27,12 @@ class LocalEnableRequest final : public application::RequestSource {
 } // namespace
 
 extern "C" void app_main() {
-    static platform::EspClock clock;
+    static wiring::Clock clock;
     static drivers::SyntheticSensor sensor(demo_sensor_value);
     static drivers::SimulatedOutput output;
     static LocalEnableRequest requests;
-    static platform::FreeRtosSnapshot<domain::Reading> readings;
-    static platform::FreeRtosSnapshot<domain::Telemetry> telemetry;
+    static wiring::Snapshot<domain::Reading> readings;
+    static wiring::Snapshot<domain::Telemetry> telemetry;
     static domain::TimedOutput policy({max_run_ms, max_sample_age_ms});
     static application::SensorWorker sampler(sensor, clock, readings);
     static application::ControlWorker controller(policy, clock, readings, requests, output,
