@@ -87,5 +87,5 @@ Breaking source adjustments inside this repository:
   without the sensor node.
 - `LogTelemetry` stays in node wiring. It prints sensor status. General logging
   remains `ESP_LOG`.
-- Application profiles (minimal, sensor, actuator) are a separate build-selection
-  change. They must stay orthogonal to chip target and board profile.
+- Application profiles are selected with `-DESPKIT_PROFILE=minimal|sensor|actuator`.
+  They stay orthogonal to chip target and board profile. See `profiles/README.md`.
