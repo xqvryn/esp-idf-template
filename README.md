@@ -107,6 +107,15 @@ until configured. Main and develop pushes evaluate stable/dev releases after all
 normally do not create a new version. `ci-required` aggregates all validation results.
 Firmware versions are calculated before compilation and checked again before publication.
 
+## Two ways to use this repository
+
+Copy it as a GitHub template when you want the build, CI, and tests in a new
+repository. Depend on individual components when an existing project should pin
+the same networking, storage, or driver sources. The template copy does not
+receive later upstream commits. The component manifests are ready to publish
+and are not uploaded to the component registry. See
+[Use ESPKit](docs/using-espkit.md).
+
 ## Customize
 
 - Rename `device` in the root CMake project.

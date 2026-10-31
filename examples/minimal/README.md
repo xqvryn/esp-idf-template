@@ -37,8 +37,13 @@ on hardware.
 This project does not put `components/` on the build path. Add a component only
 when the application calls it.
 
-1. Point `EXTRA_COMPONENT_DIRS` at the components you want. From
-   `examples/minimal/CMakeLists.txt`, before `project()`:
+The examples in this repository consume `platform`, `configuration`,
+`networking`, and `drivers` through `idf_component.yml` path dependencies.
+An external project uses the same manifest with a `git` dependency. See
+`docs/using-espkit.md`.
+
+You can also point `EXTRA_COMPONENT_DIRS` at a component directory. From
+`examples/minimal/CMakeLists.txt`, before `project()`:
 
 ```cmake
 set(EXTRA_COMPONENT_DIRS

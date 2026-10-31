@@ -21,6 +21,7 @@ nav:
   - Home: index.md
   - Get Started:
       - Installation: getting-started/installation.md
+      - Use ESPKit: using-espkit.md
       - Create Your Project: getting-started/create-project.md
       - Build and Run: getting-started/build-and-run.md
       - Troubleshooting: getting-started/troubleshooting.md
