@@ -73,7 +73,7 @@ bash tools/test-host.sh
 | `components/networking/` | Wi-Fi, MQTT telemetry, and connection coordination |
 | `tests/host/` | GoogleTest tests built without ESP-IDF |
 | `docs/` | Architecture, protocols, safety, and roadmap |
-| `examples/` | Three standalone simulation projects |
+| `examples/` | Minimal, simulation, sensor-node, and actuator-node projects |
 | `.github/workflows/` | Tests, example builds, docs, and opt-in deployment/release |
 
 See [Hardware and MQTT](docs/hardware-mqtt.md) for optional real sensor/network setup,
@@ -95,8 +95,10 @@ python -m pip install -r requirements-docs.txt
 mkdocs serve
 ```
 
-Standalone projects live in `examples/simulation`, `examples/sensor-node`, and
-`examples/actuator-node`. Each has its own README and is compiled in CI.
+Standalone projects live in `examples/minimal`, `examples/simulation`,
+`examples/sensor-node`, and `examples/actuator-node`. Each has its own README
+and is compiled in CI. `examples/minimal` does not use the sensor/actuator
+components.
 
 Development flows through `feature/* -> develop -> main`. Keep main as the stable
 template default. CI builds and tests without secrets. Set `ENABLE_PAGES=true` and/or

@@ -63,7 +63,8 @@ management backend. Keep credentials out of CI artifacts.
 
 ## Reuse and publishing
 
-Simulation, sensor-node, and actuator-node examples now build independently.
+Minimal, simulation, sensor-node, and actuator-node examples now build independently.
+The minimal example does not compile the sensor/actuator components.
 Enable GitHub's template repository setting, review the MIT
 license, verify a new repository can build without secrets, then tag the first release.
 Keep CI action commits and the build image digest pinned when upgrading dependencies.

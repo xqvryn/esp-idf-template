@@ -53,7 +53,7 @@ For the optional networking path, run a local test broker and inject disconnects
 credentials, duplicate and expired commands, fragmented payloads, queue pressure,
 and simultaneous reconnects. Observe control deadlines while the network is busy.
 
-CI compiles default and hardware-enabled root firmware, the Unity application, and all three examples. It runs
+CI compiles default and hardware-enabled root firmware, the Unity application, and every example, including `examples/minimal`. It runs
 host tests, firmware bundle integrity tests, release-rule checks, formatting, and
 strict documentation builds. `python3 tools/check_architecture.py` checks owned
 include and CMake dependency boundaries. It does not claim on-device validation.
