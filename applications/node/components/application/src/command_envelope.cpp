@@ -1,4 +1,4 @@
-#include "networking/command_envelope.hpp"
+#include "application/command_envelope.hpp"
 
 #include "application/command_path.hpp"
 
@@ -7,7 +7,7 @@
 #include <limits>
 #include <string_view>
 
-namespace networking {
+namespace application {
 
 namespace {
 
@@ -560,7 +560,7 @@ bool to_monotonic(std::int64_t wall_ms, std::int64_t offset_ms, std::int64_t& mo
 CommandEnvelopeResult decode_command_envelope(std::string_view payload, domain::Milliseconds now,
                                               domain::Milliseconds wall_offset_ms,
                                               std::uint32_t identity, std::uint32_t sequence,
-                                              application::CommandIngress& ingress) noexcept {
+                                              CommandIngress& ingress) noexcept {
     CommandEnvelopeResult result{};
     if (payload.size() > command_envelope_max_bytes) {
         result.reason = CommandEnvelopeReason::rejected_oversize;
@@ -603,4 +603,4 @@ CommandEnvelopeResult decode_command_envelope(std::string_view payload, domain::
     return result;
 }
 
-} // namespace networking
+} // namespace application

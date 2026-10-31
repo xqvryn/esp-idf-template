@@ -10,10 +10,6 @@ namespace application {
 
 class CommandIngress;
 
-} // namespace application
-
-namespace networking {
-
 // One reassembled command payload. The decoder does not join MQTT fragments.
 inline constexpr std::size_t command_envelope_max_bytes = 512;
 
@@ -49,6 +45,6 @@ struct CommandEnvelopeResult {
 CommandEnvelopeResult decode_command_envelope(std::string_view payload, domain::Milliseconds now,
                                               domain::Milliseconds wall_offset_ms,
                                               std::uint32_t identity, std::uint32_t sequence,
-                                              application::CommandIngress& ingress) noexcept;
+                                              CommandIngress& ingress) noexcept;
 
-} // namespace networking
+} // namespace application

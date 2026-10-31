@@ -61,14 +61,17 @@ control, and report behavior. `examples/minimal` does not add
 
 ## Consequences
 
-Reusable components can be omitted. A project that only needs storage or the
-SHT3x driver does not compile workers. `decode_command_envelope` stays in
-networking, so that component still links the node application.
+Reusable components can be omitted. Storage, the SHT3x driver, and networking
+do not compile workers. `examples/networking` links Wi-Fi/MQTT/SNTP without
+`applications/node`. Inbound MQTT data is `MqttPayloadHandler`; the node
+application decodes that payload with `decode_command_envelope`.
 Host tests still cover policy, workers, the SHT3x frame parser, settings
 migration, the command envelope, and the network state machine.
 
 Breaking source adjustments inside this repository:
 
+- `networking::decode_command_envelope` is now
+  `application::decode_command_envelope`.
 - `networking::encode_telemetry` is now `application::encode_telemetry`.
   `NetworkService::forward` accepts the encoded bytes.
 - `Sht3xSensor::measure()` returns `drivers::EnvironmentSample`. The composition

@@ -22,8 +22,8 @@ mirror their owning namespace. Check for SDK component collisions when adding na
 | `main/` | `device` | Product selection, board settings, task budgets, and object wiring |
 
 `platform`, `configuration`, and `drivers` live in `components/` and do not
-include the sensor-node application. `networking` lives there too; its command
-envelope calls the node ingress. `domain`, `application`,
+include the sensor-node application. `networking` does not either: inbound
+MQTT bytes stay opaque. `domain`, `application`,
 `node_drivers`, and `wiring` live in `applications/node/components/` and are
 added only by projects that use that execution model.
 `drivers::Sht3xSensor` is declared in `components/drivers/include/drivers/sht3x.hpp`.
@@ -50,9 +50,9 @@ minimal application
 Domain, application, node_drivers, and the SHT3x driver contain no
 ESP-IDF/FreeRTOS headers. Domain has no dependency on application. `platform`,
 `configuration`, and `drivers` do not include `domain` or `application`.
-Networking depends on configuration. It also keeps `decode_command_envelope`,
-which calls `CommandIngress`, so that component depends on the node application.
-Wi-Fi, SNTP, and MQTT publish do not include workers. Wiring adapts platform
+Networking depends on configuration. Inbound MQTT bytes are a raw payload
+hook. `application::decode_command_envelope` calls `CommandIngress` and lives
+with the node application, so networking does not. Wiring adapts platform
 primitives to application ports on device. It is not a generic HAL or event bus.
 Public dependencies use CMake `REQUIRES`; implementation-only ones use `PRIV_REQUIRES`.
 Run `python3 tools/check_architecture.py`; CI checks owned include and component edges.

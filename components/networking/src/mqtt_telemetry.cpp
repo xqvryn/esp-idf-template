@@ -3,6 +3,7 @@
 #include "esp_crt_bundle.h"
 #include "esp_log.h"
 #include "esp_random.h"
+#include "mqtt_client.h"
 #include "sdkconfig.h"
 
 #include <cstdio>
@@ -145,7 +146,7 @@ void MqttTelemetry::publish_availability() noexcept {
 #endif
 }
 
-void MqttTelemetry::event(void* context, esp_event_base_t, std::int32_t id, void*) {
+void MqttTelemetry::event(void* context, esp_event_base_t, std::int32_t id, void* data) {
     auto& self = *static_cast<MqttTelemetry*>(context);
     if (id == MQTT_EVENT_CONNECTED) {
         self.mqtt_up_.store(true);
@@ -153,6 +154,18 @@ void MqttTelemetry::event(void* context, esp_event_base_t, std::int32_t id, void
         ESP_LOGI(tag, "MQTT connected");
     } else if (id == MQTT_EVENT_DISCONNECTED || id == MQTT_EVENT_ERROR) {
         self.mqtt_up_.store(false);
+    } else if (id == MQTT_EVENT_DATA) {
+        const auto* event = static_cast<esp_mqtt_event_handle_t>(data);
+        if (event == nullptr || event->topic == nullptr || event->topic_len < 0 ||
+            event->data == nullptr || event->data_len < 0) {
+            return;
+        }
+        dispatch_mqtt_payload(
+            self.handler_.load(std::memory_order_acquire),
+            MqttPayload{
+                std::string_view(event->topic, static_cast<std::size_t>(event->topic_len)),
+                std::span<const char>(event->data, static_cast<std::size_t>(event->data_len)),
+                event->current_data_offset, event->total_data_len});
     }
 }
 

@@ -16,7 +16,7 @@ namespace networking {
 // offline telemetry backlog. publish() may run on the reporter task; start(),
 // stop(), and publish_availability() run on the network worker. The mutex
 // covers the client pointer. The event callback only stores atomics.
-// A future adapter calls application::CommandIngress::submit and does not write outputs.
+// Inbound bytes are delivered to the payload handler. That handler decodes them.
 class MqttTelemetry final : public MqttConnection {
     public:
     MqttTelemetry() = default;
@@ -32,6 +32,10 @@ class MqttTelemetry final : public MqttConnection {
 
     void publish_availability() noexcept override;
 
+    void set_payload_handler(MqttPayloadHandler* handler) noexcept override {
+        handler_.store(handler, std::memory_order_release);
+    }
+
     std::uint32_t dropped_reports() const noexcept {
         return dropped_.load();
     }
@@ -42,6 +46,7 @@ class MqttTelemetry final : public MqttConnection {
     std::atomic<esp_mqtt_client_handle_t> client_{nullptr};
     std::atomic<bool> mqtt_up_{false};
     std::atomic<std::uint32_t> dropped_{0};
+    std::atomic<MqttPayloadHandler*> handler_{nullptr};
     // Bumped by the MQTT task on connect. The network worker publishes once
     // per value and is the only writer of availability_published_.
     std::atomic<std::uint32_t> availability_epoch_{0};

@@ -6,6 +6,12 @@ simulation examples reference the repository's shared components through
 wiring. Build each with `idf.py -C examples/<name> set-target esp32s3` followed by
 `idf.py -C examples/<name> build`. Each directory includes a README with flashing commands.
 
+## Networking only
+
+`examples/networking` links Wi-Fi, SNTP, and MQTT without
+`applications/node`. CI rejects the build if the node application library is
+present. It does not open a socket.
+
 ## Minimal
 
 `examples/minimal` logs `Hello ESP32!` and stops there. It does not compile

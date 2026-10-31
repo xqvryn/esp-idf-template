@@ -28,7 +28,7 @@ description, license, and `idf: ">=5.4"`.
 | --- | --- | --- |
 | `platform` | `components/platform/idf_component.yml` | ESP-IDF |
 | `configuration` | `components/configuration/idf_component.yml` | ESP-IDF |
-| `networking` | `components/networking/idf_component.yml` | `configuration`, and the node application because `decode_command_envelope` calls `CommandIngress` |
+| `networking` | `components/networking/idf_component.yml` | `configuration` |
 | `drivers` | `components/drivers/idf_component.yml` | ESP-IDF |
 
 `networking` depends on `configuration` through a path dependency so a build of
@@ -53,11 +53,11 @@ dependencies:
 Replace `version: main` with a tag once a release contains the manifest you
 need. `git`, `path`, and `version` together select one component inside the
 repository. Require the component from CMake with `REQUIRES` or `PRIV_REQUIRES`.
-`platform`, `configuration`, and `drivers` do not compile the sensor workers.
-`networking` still does: `decode_command_envelope` calls `CommandIngress`, so
-also put `applications/node/components` on the component path (or add `domain`
-and `application` the same way) when you depend on `networking`. Leave that
-directory out when you do not use networking or the sensor/actuator workers.
+`platform`, `configuration`, `networking`, and `drivers` do not compile the
+sensor workers. `examples/networking` is that build. Leave
+`applications/node` off the path unless you want the sensor/actuator workers.
+A node that accepts MQTT commands installs `networking::MqttPayloadHandler`
+and calls `application::decode_command_envelope` itself.
 
 The examples in this repository use a local path instead of `git`, which is the
 development form of that dependency:

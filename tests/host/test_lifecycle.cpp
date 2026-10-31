@@ -188,6 +188,9 @@ class IdleMqtt final : public networking::MqttConnection {
 
     void publish_availability() noexcept override {
     }
+
+    void set_payload_handler(networking::MqttPayloadHandler*) noexcept override {
+    }
 };
 
 class IdleTime final : public networking::NetworkTime {
