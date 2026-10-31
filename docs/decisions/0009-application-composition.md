@@ -78,10 +78,9 @@ Breaking source adjustments inside this repository:
 
 ## Follow-ups
 
-- Publish the reusable components through the ESP-IDF Component Manager, with
-  one manifest per component. Do not publish to the registry until a maintainer
-  account is available. Examples should consume those manifests the way an
-  external project would.
+- Component manifests live next to `platform`, `configuration`, `networking`,
+  and `drivers`. Examples consume them with path dependencies. They are not
+  uploaded to the component registry. See [Use ESPKit](../using-espkit.md).
 - `TimedOutput::update` still takes `Reading`. Split that policy from
   measurement types only when a second application needs the state machine
   without the sensor node.

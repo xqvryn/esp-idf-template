@@ -1,0 +1,6 @@
+version: "0.1.0"
+description: "SHT3x-DIS temperature and humidity driver"
+url: "https://github.com/xqvryn/esp-idf-template"
+license: "MIT"
+dependencies:
+  idf: ">=5.4"
