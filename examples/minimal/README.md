@@ -64,11 +64,11 @@ idf_component_register(SRCS "app_main.cpp" PRIV_REQUIRES log configuration)
 | `platform` | ESP-IDF clock, logging helpers, and board adapters |
 | `networking` | Wi-Fi station and MQTT |
 
-`configuration` does not require the sensor/actuator application. `platform` and
-`networking` currently implement ports owned by `application`, so requiring
-either of them also builds that component. Leave `domain`, `application`, and
-`drivers` off the path unless the sensor → control → report execution model is
-the one you want.
+`platform`, `configuration` (NVS storage), `networking`, and `drivers` (SHT3x)
+do not require the sensor/actuator application. Leave `applications/node/` off
+the path unless the sensor → control → report execution model is the one you
+want. That directory holds `domain`, `application`, simulated drivers, and the
+device wiring adapters.
 
 Chip target (`idf.py set-target`) is a separate choice from which of these
 components you require. Board pin maps stay in the board profile, not in this

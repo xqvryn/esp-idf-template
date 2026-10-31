@@ -1,7 +1,8 @@
 #pragma once
 
-#include "application/ports/device.hpp"
 #include "configuration/network_config.hpp"
+
+#include <span>
 
 namespace networking {
 
@@ -18,8 +19,11 @@ class WifiConnection {
     virtual bool connected() const noexcept = 0;
 };
 
-class MqttConnection : public application::TelemetrySink {
+// Link client. Payloads are opaque bytes. Sensor telemetry encoding stays with
+// the application that owns the measurement.
+class MqttConnection {
     public:
+    virtual ~MqttConnection() = default;
     virtual bool start(const configuration::NetworkConfig& config) noexcept = 0;
     // Idempotent. Drops the client so a later start() can create another one.
     // A stop or destroy the SDK refuses leaves that client in place.
@@ -28,6 +32,8 @@ class MqttConnection : public application::TelemetrySink {
     // Network worker. Publishes retained availability after a connection is
     // recorded. The MQTT task callback must not enqueue.
     virtual void publish_availability() noexcept = 0;
+    // false when the payload was not queued. Empty payloads are dropped.
+    virtual bool publish(std::span<const char> payload) noexcept = 0;
 };
 
 class NetworkTime {

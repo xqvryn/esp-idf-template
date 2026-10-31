@@ -11,16 +11,22 @@ mirror their owning namespace. Check for SDK component collisions when adding na
 
 | Component | Namespace | Responsibility |
 | --- | --- | --- |
-| `domain` | `domain` | Measurements, status, timed-output policy, command checks, and the boot-health decision |
-| `application` | `application` | Portable ports, command ingress, output quiesce, and single-step workers |
-| `drivers` | `drivers` | Synthetic/SHT3x inputs and simulated output |
-| `platform` | `platform` | ESP-IDF I2C, monotonic clock, FreeRTOS queues/tasks, log sink |
-| `configuration` | `configuration` | Network settings validation, schema migration, and NVS loading |
-| `networking` | `networking` | Wi-Fi lifecycle, MQTT telemetry, command envelopes, and connection coordination |
+| `platform` | `platform` | Optional ESP-IDF clock, I2C, and FreeRTOS queue/task primitives |
+| `configuration` | `configuration` | Optional NVS storage, settings validation, and schema migration |
+| `networking` | `networking` | Optional Wi-Fi, SNTP, MQTT client, connection lifecycle, and command envelopes |
+| `drivers` | `drivers` | Optional SHT3x measurement. The driver does not know about node workers |
+| `domain` | `domain` | Sensor-node measurements, status, timed-output policy, command checks, and boot health |
+| `application` | `application` | Sensor-node ports, workers, command ingress, quiesce, and telemetry JSON |
+| `node_drivers` | `drivers` | Synthetic input and simulated output for the sensor/actuator examples |
+| `wiring` | `wiring` | Adapts platform primitives to the sensor-node ports on device |
 | `main/` | `device` | Product selection, board settings, task budgets, and object wiring |
 
-For example, `drivers::Sht3xSensor` is declared in
-`components/drivers/include/drivers/sht3x.hpp`.
+`platform`, `configuration`, and `drivers` live in `components/` and do not
+include the sensor-node application. `networking` lives there too; its command
+envelope calls the node ingress. `domain`, `application`,
+`node_drivers`, and `wiring` live in `applications/node/components/` and are
+added only by projects that use that execution model.
+`drivers::Sht3xSensor` is declared in `components/drivers/include/drivers/sht3x.hpp`.
 Header paths use `application/...`. Kconfig symbols retain `ESPKIT_` because
 they share a global configuration namespace; the stored NVS namespace remains
 `espkit` to preserve provisioned settings.
@@ -31,18 +37,23 @@ justify a new build boundary.
 ## Dependency direction
 
 ```text
-main (composition root)
-  ├── drivers ──────────┐
-  ├── platform ─────────┤
-  ├── networking ───────┤──> application ──> domain
-  │      └── configuration (independent settings adapter)
-  └── domain / application
+main (sensor-node composition)
+  ├── wiring ──────────────> platform
+  ├── node_drivers ────────> application ──> domain
+  ├── drivers (SHT3x)
+  └── networking ──────────> configuration
+
+minimal application
+  └── log
 ```
 
-Domain, application, and drivers contain no ESP-IDF/FreeRTOS headers. Domain
-has no dependency on application. Ports belong to the application that consumes
-them, not to the SDK implementation. Platform, networking, and configuration
-must not depend on each other except networking's explicit configuration dependency.
+Domain, application, node_drivers, and the SHT3x driver contain no
+ESP-IDF/FreeRTOS headers. Domain has no dependency on application. `platform`,
+`configuration`, and `drivers` do not include `domain` or `application`.
+Networking depends on configuration. It also keeps `decode_command_envelope`,
+which calls `CommandIngress`, so that component depends on the node application.
+Wi-Fi, SNTP, and MQTT publish do not include workers. Wiring adapts platform
+primitives to application ports on device. It is not a generic HAL or event bus.
 Public dependencies use CMake `REQUIRES`; implementation-only ones use `PRIV_REQUIRES`.
 Run `python3 tools/check_architecture.py`; CI checks owned include and component edges.
 This is a lightweight boundary check, not a general C++ dependency analyzer.
@@ -120,8 +131,9 @@ the resources `stop` actually releases. `esp_netif_create_default_wifi_sta` abor
 on failure, so the adapter uses the fallible netif calls instead; an abort would
 stop the control task as well.
 
-The reporter calls `NetworkService::report()`, which gates transmission on the
-Wi-Fi link and delegates to MQTT. That call may run while the network task is
+The reporter encodes `domain::Telemetry` with `application::encode_telemetry`
+and calls `NetworkService::forward()`. That call gates transmission on the
+Wi-Fi link and delegates the bytes to MQTT. It may run while the network task is
 stopping. The MQTT adapter serializes use of the client pointer. Wi-Fi and MQTT
 callbacks only update atomics. The network worker enqueues retained online
 availability after the callback records a connection. Config strings remain

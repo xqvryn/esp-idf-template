@@ -1,7 +1,5 @@
 #pragma once
 
-#include "domain/types.hpp"
-
 #include <cstdint>
 
 namespace networking {
@@ -138,7 +136,7 @@ enum class TimeWait : std::uint8_t {
     fail_bringup
 };
 
-constexpr TimeWait time_wait_decision(domain::Milliseconds now, domain::Milliseconds deadline,
+constexpr TimeWait time_wait_decision(std::int64_t now, std::int64_t deadline,
                                       int sessions_completed, int session_budget) noexcept {
     if (session_budget <= sessions_completed) {
         return TimeWait::fail_bringup;

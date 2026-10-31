@@ -1,6 +1,5 @@
 #pragma once
 
-#include "application/ports/device.hpp"
 #include "configuration/network_config.hpp"
 #include "mqtt_client.h"
 #include "networking/connections.hpp"
@@ -8,12 +7,13 @@
 
 #include <atomic>
 #include <mutex>
+#include <span>
 
 namespace networking {
 
 // Boot-lifetime MQTT adapter. The configuration passed to start() must outlive
 // the client. stop() destroys that client. No command subscription and no
-// offline telemetry backlog. report() may run on the reporter task; start(),
+// offline telemetry backlog. publish() may run on the reporter task; start(),
 // stop(), and publish_availability() run on the network worker. The mutex
 // covers the client pointer. The event callback only stores atomics.
 // A future adapter calls application::CommandIngress::submit and does not write outputs.
@@ -24,7 +24,7 @@ class MqttTelemetry final : public MqttConnection {
     MqttTelemetry& operator=(const MqttTelemetry&) = delete;
     bool start(const configuration::NetworkConfig& config) noexcept override;
     void stop() noexcept override;
-    void report(const domain::Telemetry& status) noexcept override;
+    bool publish(std::span<const char> payload) noexcept override;
 
     void drop_report() noexcept override {
         ++dropped_;

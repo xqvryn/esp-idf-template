@@ -2,16 +2,17 @@
 
 #include <cstring>
 #include <gtest/gtest.h>
+#include <span>
 #include <string>
 #include <vector>
 
 namespace {
 
-class FakeClock final : public application::Clock {
+class FakeClock final : public networking::SteadyTime {
     public:
-    domain::Milliseconds time{0};
+    std::int64_t time{0};
 
-    domain::Milliseconds now() const noexcept override {
+    std::int64_t now() const noexcept override {
         return time;
     }
 };
@@ -74,8 +75,13 @@ class FakeMqtt final : public networking::MqttConnection {
         holding = false;
     }
 
-    void report(const domain::Telemetry&) noexcept override {
+    bool publish(std::span<const char> payload) noexcept override {
+        if (payload.empty()) {
+            ++drops;
+            return false;
+        }
         ++reports;
+        return true;
     }
 
     void drop_report() noexcept override {
@@ -481,10 +487,11 @@ TEST_F(NetworkServiceTest, StartWhileRunningDoesNotBringTheStackUpTwice) {
 }
 
 TEST_F(NetworkServiceTest, ReportsAreDroppedOfflineAndForwardedOnline) {
-    service.report({});
+    service.forward({});
     EXPECT_EQ(mqtt.drops, 1);
     wifi.online = true;
-    service.report({});
+    constexpr char payload[] = "{}";
+    service.forward(std::span<const char>(payload, 2));
     EXPECT_EQ(mqtt.reports, 1);
 }
 

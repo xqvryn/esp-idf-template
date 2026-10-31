@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <gtest/gtest.h>
+#include <span>
 #include <vector>
 
 namespace {
@@ -142,9 +143,9 @@ class AlwaysOn final : public application::RequestSource {
     }
 };
 
-class IdleClock final : public application::Clock {
+class IdleClock final : public application::Clock, public networking::SteadyTime {
     public:
-    domain::Milliseconds now() const noexcept override {
+    std::int64_t now() const noexcept override {
         return 1000;
     }
 };
@@ -178,10 +179,11 @@ class IdleMqtt final : public networking::MqttConnection {
     void stop() noexcept override {
     }
 
-    void report(const domain::Telemetry&) noexcept override {
+    void drop_report() noexcept override {
     }
 
-    void drop_report() noexcept override {
+    bool publish(std::span<const char>) noexcept override {
+        return false;
     }
 
     void publish_availability() noexcept override {

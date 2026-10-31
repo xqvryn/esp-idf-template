@@ -8,7 +8,7 @@ namespace {
 
 constexpr std::uint8_t crc_initial = 0xff;
 constexpr std::uint8_t crc_polynomial = 0x31;
-constexpr domain::Milliseconds conversion_wait_ms = 20;
+constexpr std::int64_t conversion_wait_ms = 20;
 constexpr std::array<std::uint8_t, 2> measurement_command{0x24, 0x00};
 
 std::uint8_t crc(std::span<const std::uint8_t> bytes) noexcept {
@@ -35,20 +35,16 @@ EnvironmentSample decode_sht3x(std::span<const std::uint8_t> frame) noexcept {
     return {-45.0F + 175.0F * temperature / 65535.0F, 100.0F * humidity / 65535.0F, true};
 }
 
-domain::Reading Sht3xSensor::read(domain::Milliseconds now) noexcept {
-    domain::Reading result{0, now, false, domain::MeasurementUnit::celsius,
-                           domain::DataOrigin::physical};
+EnvironmentSample Sht3xSensor::measure() noexcept {
     if (!bus_.write(measurement_command)) {
-        return result;
+        return {};
     }
     delay_.sleep_for(conversion_wait_ms);
     std::array<std::uint8_t, 6> frame{};
     if (!bus_.read(frame)) {
-        return result;
+        return {};
     }
-    const auto sample = decode_sht3x(frame);
-    return {sample.temperature_celsius, now, sample.valid, domain::MeasurementUnit::celsius,
-            domain::DataOrigin::physical};
+    return decode_sht3x(frame);
 }
 
 } // namespace drivers

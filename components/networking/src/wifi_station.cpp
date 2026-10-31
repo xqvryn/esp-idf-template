@@ -14,7 +14,7 @@ namespace networking {
 namespace {
 
 constexpr char tag[] = "wifi";
-constexpr domain::Milliseconds association_timeout_ms = 20000;
+constexpr std::int64_t association_timeout_ms = 20000;
 
 bool released(esp_err_t result) noexcept {
     return result == ESP_OK || result == ESP_ERR_WIFI_NOT_INIT ||

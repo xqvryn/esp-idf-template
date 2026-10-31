@@ -3,7 +3,7 @@
 ## Understand the boundary
 
 `SensorWorker` receives a `SensorSource&`, `Clock&`, and reading writer. It does not
-construct a particular sensor or call ESP-IDF. See `components/application/include/application/ports/device.hpp`.
+construct a particular sensor or call ESP-IDF. See `applications/node/components/application/include/application/ports/device.hpp`.
 
 ## Implement a source
 

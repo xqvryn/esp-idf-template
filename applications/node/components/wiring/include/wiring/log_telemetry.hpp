@@ -2,7 +2,7 @@
 
 #include "application/ports/device.hpp"
 
-namespace platform {
+namespace wiring {
 
 class LogTelemetry final : public application::TelemetrySink {
     public:
@@ -16,4 +16,4 @@ class LogTelemetry final : public application::TelemetrySink {
     const char* output_mode_;
 };
 
-} // namespace platform
+} // namespace wiring

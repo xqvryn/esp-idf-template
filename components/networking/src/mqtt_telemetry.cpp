@@ -3,10 +3,8 @@
 #include "esp_crt_bundle.h"
 #include "esp_log.h"
 #include "esp_random.h"
-#include "networking/telemetry.hpp"
 #include "sdkconfig.h"
 
-#include <array>
 #include <cstdio>
 
 namespace networking {
@@ -14,7 +12,6 @@ namespace networking {
 namespace {
 
 constexpr char tag[] = "network";
-constexpr unsigned payload_capacity = 512;
 constexpr unsigned outbox_limit_bytes = 4096;
 constexpr unsigned mqtt_retry_ms = 5000;
 constexpr unsigned network_timeout_ms = 3000;
@@ -159,24 +156,25 @@ void MqttTelemetry::event(void* context, esp_event_base_t, std::int32_t id, void
     }
 }
 
-void MqttTelemetry::report(const domain::Telemetry& status) noexcept {
+bool MqttTelemetry::publish(std::span<const char> payload) noexcept {
 #if CONFIG_ESPKIT_NETWORK_ENABLED
     const std::lock_guard<std::mutex> lock(publish_mutex_);
     const auto client = client_.load();
-    if (client == nullptr || !mqtt_up_.load()) {
+    if (payload.empty() || client == nullptr || !mqtt_up_.load()) {
         ++dropped_;
-        return;
+        return false;
     }
-    std::array<char, payload_capacity> payload{};
-    const auto length = encode_telemetry(status, payload);
     // QoS 0 + store=false: no offline telemetry backlog or replay after reconnect.
-    if (length == 0 || esp_mqtt_client_get_outbox_size(client) >= outbox_limit_bytes ||
-        esp_mqtt_client_enqueue(client, telemetry_topic_, payload.data(), static_cast<int>(length),
-                                0, 0, false) < 0) {
+    if (esp_mqtt_client_get_outbox_size(client) >= outbox_limit_bytes ||
+        esp_mqtt_client_enqueue(client, telemetry_topic_, payload.data(),
+                                static_cast<int>(payload.size()), 0, 0, false) < 0) {
         ++dropped_;
+        return false;
     }
+    return true;
 #else
-    (void)status;
+    (void)payload;
+    return false;
 #endif
 }
 

@@ -179,13 +179,14 @@ that can fail partway and must be retryable without rebooting.
 | Select a different sensor/output | `main/device.cpp` |
 | Change periods, policy, task budgets | `main/device_config.hpp` |
 | Change wiring | `main/boards/esp32s3/board_config.hpp` and Kconfig |
-| Add a portable driver | `components/drivers/` |
-| Change local safety rules | `components/domain/` and host tests |
+| Add a portable driver | `components/drivers/` for a reusable part, or `applications/node/` when it is node-specific |
+| Change local safety rules | `applications/node/components/domain/` and host tests |
 | Change command admission or add a command type | `domain/command.hpp`, `application/command_path.hpp`, and host tests |
 | Confirm output is off before a restart | `application/output_quiesce.hpp` and host tests |
 | Decode a remote command payload | `networking/command_envelope.hpp`, then `CommandIngress::submit` |
 | Subscribe to remote commands later | `components/networking/`, calling `decode_command_envelope` |
-| Change MQTT encoding/connection | `components/networking/` |
+| Change MQTT JSON encoding | `application/telemetry_codec.hpp` |
+| Change the Wi-Fi/MQTT connection | `components/networking/` |
 | Add a runtime network or identity setting | `configuration/network_config.hpp`, `settings_migration.hpp`, `NvsConfigStore`, and `tools/provision_device.py` |
 | Change network start, stop, or retry | `networking/lifecycle.hpp`, `network_service.cpp`, and the adapter `stop` path |
 

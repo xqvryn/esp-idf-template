@@ -1,15 +1,8 @@
 #pragma once
 
-#include "domain/types.hpp"
-
-#include <cstddef>
 #include <cstdint>
-#include <span>
 
 namespace networking {
-
-// Returns payload length (excluding NUL), or zero for invalid/insufficient storage.
-std::size_t encode_telemetry(const domain::Telemetry& status, std::span<char> buffer) noexcept;
 
 class ReconnectBackoff {
     public:

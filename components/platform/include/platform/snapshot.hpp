@@ -1,6 +1,5 @@
 #pragma once
 
-#include "application/ports/device.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "platform/constants.hpp"
@@ -11,9 +10,7 @@
 namespace platform {
 
 // Latest-value transport only. Command FIFOs are FreeRtosFifo and reject when full.
-template <typename T>
-class FreeRtosSnapshot final : public application::SnapshotReader<T>,
-                               public application::SnapshotWriter<T> {
+template <typename T> class FreeRtosSnapshot final {
     static_assert(std::is_trivially_copyable_v<T>);
 
     public:
@@ -21,7 +18,7 @@ class FreeRtosSnapshot final : public application::SnapshotReader<T>,
         : queue_(xQueueCreate(runtime_constants::latest_snapshot_capacity, sizeof(T))) {
     }
 
-    ~FreeRtosSnapshot() override {
+    ~FreeRtosSnapshot() {
         if (queue_) {
             vQueueDelete(queue_);
         }
@@ -34,11 +31,11 @@ class FreeRtosSnapshot final : public application::SnapshotReader<T>,
         return queue_ != nullptr;
     }
 
-    bool latest(T& value) const noexcept override {
+    bool latest(T& value) const noexcept {
         return queue_ && xQueuePeek(queue_, &value, 0) == pdTRUE;
     }
 
-    void publish(const T& value) noexcept override {
+    void publish(const T& value) noexcept {
         if (!queue_ || xQueueOverwrite(queue_, &value) != pdPASS) {
             std::abort();
         }

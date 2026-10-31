@@ -65,12 +65,11 @@ bash tools/test-host.sh
 | Path | Responsibility |
 | --- | --- |
 | `main/` | Entry point, concrete wiring, board settings, and task budgets |
-| `components/domain/` | Portable measurements, status, and safety policy |
-| `components/application/` | Portable ports and workers |
-| `components/drivers/` | Synthetic/SHT3x sensors and simulated output |
-| `components/platform/` | ESP-IDF I2C, FreeRTOS scheduling/queues, clock, and logs |
-| `components/configuration/` | Validated runtime NVS network settings |
-| `components/networking/` | Wi-Fi, MQTT telemetry, and connection coordination |
+| `components/platform/` | Optional ESP-IDF clock, I2C, and FreeRTOS primitives |
+| `components/configuration/` | Optional validated NVS settings |
+| `components/networking/` | Optional Wi-Fi, SNTP, and MQTT lifecycle |
+| `components/drivers/` | Optional SHT3x driver |
+| `applications/node/` | Sensor/actuator domain, workers, simulated drivers, and device wiring |
 | `tests/host/` | GoogleTest tests built without ESP-IDF |
 | `docs/` | Architecture, protocols, safety, and roadmap |
 | `examples/` | Minimal, simulation, sensor-node, and actuator-node projects |

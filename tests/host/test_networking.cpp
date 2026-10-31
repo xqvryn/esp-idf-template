@@ -1,4 +1,5 @@
 #include "application/command_path.hpp"
+#include "application/telemetry_codec.hpp"
 #include "configuration/network_config.hpp"
 #include "domain/policy_defaults.hpp"
 #include "networking/command_envelope.hpp"
@@ -63,7 +64,7 @@ TEST(TelemetryEncoding, CarriesMeasurementUnitTimestampAndFault) {
                              domain::OutputError::none,
                              {25.5F, 900, true, domain::MeasurementUnit::celsius}};
     std::array<char, 512> buffer{};
-    const auto size = networking::encode_telemetry(status, buffer);
+    const auto size = application::encode_telemetry(status, buffer);
     ASSERT_GT(size, 0U);
     const std::string_view json(buffer.data(), size);
     EXPECT_NE(json.find("\"value\":25.500"), json.npos);
@@ -80,11 +81,11 @@ TEST(TelemetryEncoding, InvalidNumbersBecomeNullAndSmallBuffersFail) {
                              domain::OutputError::hardware_fault,
                              {std::numeric_limits<float>::quiet_NaN(), 900, true}};
     std::array<char, 512> buffer{};
-    ASSERT_GT(networking::encode_telemetry(status, buffer), 0U);
+    ASSERT_GT(application::encode_telemetry(status, buffer), 0U);
     EXPECT_NE(std::string_view(buffer.data()).find("\"value\":null"), std::string_view::npos);
     EXPECT_NE(std::string_view(buffer.data()).find("\"valid\":false"), std::string_view::npos);
     std::array<char, 8> small{};
-    EXPECT_EQ(networking::encode_telemetry(status, small), 0U);
+    EXPECT_EQ(application::encode_telemetry(status, small), 0U);
 }
 
 template <typename T>
