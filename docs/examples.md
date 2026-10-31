@@ -1,9 +1,18 @@
 # Examples
 
-All three projects are standalone ESP-IDF applications referencing the repository's
-shared components through `EXTRA_COMPONENT_DIRS`. They require no external wiring.
-Build each with `idf.py -C examples/<name> set-target esp32s3` followed by
+These projects are standalone ESP-IDF applications. The sensor, actuator, and
+simulation examples reference the repository's shared components through
+`EXTRA_COMPONENT_DIRS`. The minimal example does not. They require no external
+wiring. Build each with `idf.py -C examples/<name> set-target esp32s3` followed by
 `idf.py -C examples/<name> build`. Each directory includes a README with flashing commands.
+
+## Minimal
+
+`examples/minimal` logs `Hello ESP32!` and stops there. It does not compile
+sensors, actuators, networking, or the ESPKit `domain` and `application`
+components. Use it to start a different execution model on the same build and CI
+infrastructure. Its README explains how to opt in to `platform`, `configuration`
+(NVS storage), and `networking`.
 
 ## Simulation
 
