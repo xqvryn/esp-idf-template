@@ -13,16 +13,17 @@ mirror their owning namespace. Check for SDK component collisions when adding na
 | --- | --- | --- |
 | `platform` | `platform` | Optional ESP-IDF clock, I2C, and FreeRTOS queue/task primitives |
 | `configuration` | `configuration` | Optional NVS storage, settings validation, and schema migration |
-| `networking` | `networking` | Optional Wi-Fi, SNTP, MQTT client, and connection lifecycle |
+| `networking` | `networking` | Optional Wi-Fi, SNTP, MQTT client, connection lifecycle, and command envelopes |
 | `drivers` | `drivers` | Optional SHT3x measurement. The driver does not know about node workers |
 | `domain` | `domain` | Sensor-node measurements, status, timed-output policy, command checks, and boot health |
-| `application` | `application` | Sensor-node ports, workers, command ingress, quiesce, telemetry JSON, and command envelopes |
+| `application` | `application` | Sensor-node ports, workers, command ingress, quiesce, and telemetry JSON |
 | `node_drivers` | `drivers` | Synthetic input and simulated output for the sensor/actuator examples |
 | `wiring` | `wiring` | Adapts platform primitives to the sensor-node ports on device |
 | `main/` | `device` | Product selection, board settings, task budgets, and object wiring |
 
-`platform`, `configuration`, `networking`, and `drivers` live in `components/` and
-do not include the sensor-node application. `domain`, `application`,
+`platform`, `configuration`, and `drivers` live in `components/` and do not
+include the sensor-node application. `networking` lives there too; its command
+envelope calls the node ingress. `domain`, `application`,
 `node_drivers`, and `wiring` live in `applications/node/components/` and are
 added only by projects that use that execution model.
 `drivers::Sht3xSensor` is declared in `components/drivers/include/drivers/sht3x.hpp`.
@@ -47,11 +48,12 @@ minimal application
 ```
 
 Domain, application, node_drivers, and the SHT3x driver contain no
-ESP-IDF/FreeRTOS headers. Domain has no dependency on application. Reusable
-components (`platform`, `configuration`, `networking`, `drivers`) do not include
-`domain` or `application`. Networking depends on configuration. Wiring is the
-device-only adapter from platform primitives to application ports. It is not a
-generic HAL or event bus.
+ESP-IDF/FreeRTOS headers. Domain has no dependency on application. `platform`,
+`configuration`, and `drivers` do not include `domain` or `application`.
+Networking depends on configuration. It also keeps `decode_command_envelope`,
+which calls `CommandIngress`, so that component depends on the node application.
+Wi-Fi, SNTP, and MQTT publish do not include workers. Wiring adapts platform
+primitives to application ports on device. It is not a generic HAL or event bus.
 Public dependencies use CMake `REQUIRES`; implementation-only ones use `PRIV_REQUIRES`.
 Run `python3 tools/check_architecture.py`; CI checks owned include and component edges.
 This is a lightweight boundary check, not a general C++ dependency analyzer.

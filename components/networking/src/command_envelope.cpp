@@ -1,4 +1,4 @@
-#include "application/command_envelope.hpp"
+#include "networking/command_envelope.hpp"
 
 #include "application/command_path.hpp"
 
@@ -7,7 +7,7 @@
 #include <limits>
 #include <string_view>
 
-namespace application {
+namespace networking {
 
 namespace {
 
@@ -603,4 +603,4 @@ CommandEnvelopeResult decode_command_envelope(std::string_view payload, domain::
     return result;
 }
 
-} // namespace application
+} // namespace networking

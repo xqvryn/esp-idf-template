@@ -61,15 +61,14 @@ control, and report behavior. `examples/minimal` does not add
 
 ## Consequences
 
-Reusable components can be omitted. A project that only needs storage does not
-compile workers, and a project that needs Wi-Fi does not compile `SensorWorker`.
+Reusable components can be omitted. A project that only needs storage or the
+SHT3x driver does not compile workers. `decode_command_envelope` stays in
+networking, so that component still links the node application.
 Host tests still cover policy, workers, the SHT3x frame parser, settings
-migration, and the network state machine.
+migration, the command envelope, and the network state machine.
 
 Breaking source adjustments inside this repository:
 
-- `networking::decode_command_envelope` is now
-  `application::decode_command_envelope`.
 - `networking::encode_telemetry` is now `application::encode_telemetry`.
   `NetworkService::forward` accepts the encoded bytes.
 - `Sht3xSensor::measure()` returns `drivers::EnvironmentSample`. The composition

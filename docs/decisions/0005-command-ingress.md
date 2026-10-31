@@ -49,7 +49,7 @@ the default firmware calls `submit`, so the output request stays off.
 
 Duplicate ids and sequence cursors live in RAM and reset on reboot. The history
 holds eight ids. After that, only the oldest id is forgotten; a stale sequence
-still rejects a replay. `application::decode_command_envelope` bounds the payload
+still rejects a replay. `networking::decode_command_envelope` bounds the payload
 and converts a trusted wall-clock deadline into monotonic `expires_at`, then
 calls `submit` with `CommandSource::remote`. It does not authenticate the caller
 or open a socket. The caller supplies identity and sequence after authentication.

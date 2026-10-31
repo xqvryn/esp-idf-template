@@ -19,7 +19,9 @@ COMPONENTS = {
 ALLOWED = {
     'platform': set(),
     'configuration': set(),
-    'networking': {'configuration'},
+    # The command envelope calls CommandIngress, so networking depends on the
+    # node application. Platform, storage, and the SHT3x driver do not.
+    'networking': {'configuration', 'domain', 'application'},
     'drivers': set(),
     'domain': set(),
     'application': {'domain'},

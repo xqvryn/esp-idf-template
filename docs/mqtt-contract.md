@@ -30,7 +30,7 @@ firmware constructs it and never calls it. `ESPKIT_REMOTE_COMMANDS` defaults to
 off; `CommandSource::remote` is then `rejected_unauthorized`. Turning the option
 on does not open a socket or subscribe to `commands`.
 
-`application::decode_command_envelope` reads one reassembled payload. It does not
+`networking::decode_command_envelope` reads one reassembled payload. It does not
 open a socket. The caller passes monotonic `now`, `wall_offset_ms` (trusted
 wall-clock milliseconds minus `now`), the authenticated identity, and the next
 remote sequence. The decoder's only effect is `submit` with
