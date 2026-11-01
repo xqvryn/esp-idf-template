@@ -214,7 +214,7 @@ TEST(ServiceLifecycle, NetworkFailureDoesNotChangeAnIndependentControlOutput) {
     MemoryTelemetry telemetry;
     AlwaysOn requests;
     CountingOutput output;
-    domain::TimedOutput policy({});
+    timed_output::TimedOutput policy({});
     application::ControlWorker control(policy, clock, readings, requests, output, telemetry);
     control.step();
     ASSERT_TRUE(output.enabled);

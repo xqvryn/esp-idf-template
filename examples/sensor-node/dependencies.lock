@@ -11,9 +11,18 @@ dependencies:
       path: ../../components/platform
       type: local
     version: 0.1.0
+  timed_output:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/timed_output
+      type: local
+    version: 0.1.0
 direct_dependencies:
 - idf
 - platform
-manifest_hash: 599682d9bb42d7755baeb93505917aa614c8845d4035dc780c9057b641b6e89c
+- timed_output
+manifest_hash: 4537b4e1e85908217cea6898102d4f6db0b3290f784710a8f2f86f3278f02a65
 target: esp32s3
 version: 2.0.0

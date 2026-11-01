@@ -11,6 +11,7 @@ COMPONENTS = {
     'configuration': ROOT / 'components' / 'configuration',
     'networking': ROOT / 'components' / 'networking',
     'drivers': ROOT / 'components' / 'drivers',
+    'timed_output': ROOT / 'components' / 'timed_output',
     'domain': ROOT / 'applications' / 'node' / 'components' / 'domain',
     'application': ROOT / 'applications' / 'node' / 'components' / 'application',
     'node_drivers': ROOT / 'applications' / 'node' / 'components' / 'node_drivers',
@@ -21,12 +22,13 @@ ALLOWED = {
     'configuration': set(),
     'networking': {'configuration'},
     'drivers': set(),
+    'timed_output': set(),
     'domain': set(),
-    'application': {'domain'},
+    'application': {'domain', 'timed_output'},
     'node_drivers': {'domain', 'application'},
     'wiring': {'domain', 'application', 'platform', 'drivers', 'node_drivers'},
 }
-PORTABLE = {'drivers', 'domain', 'application', 'node_drivers'}
+PORTABLE = {'drivers', 'domain', 'application', 'node_drivers', 'timed_output'}
 
 
 def main() -> int:

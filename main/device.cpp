@@ -197,7 +197,7 @@ class DeviceRuntime {
     networking::SntpTime network_time_;
     networking::NetworkService network_{wifi_, mqtt_, network_time_, clock_};
     CombinedReporter reporter_{log_, network_, command_results_};
-    domain::TimedOutput policy_{defaults::output_policy};
+    timed_output::TimedOutput policy_{defaults::output_policy};
     app::SensorWorker sensor_worker_;
     app::ControlWorker control_worker_;
     app::ReporterWorker reporter_worker_;

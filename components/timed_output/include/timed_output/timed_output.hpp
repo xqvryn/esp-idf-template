@@ -1,12 +1,23 @@
 #pragma once
 
-#include "domain/policy_defaults.hpp"
+#include <cstdint>
 
-namespace domain {
+namespace timed_output {
+
+using Milliseconds = std::int64_t;
+
+inline constexpr Milliseconds default_max_run_ms = 5000;
+inline constexpr Milliseconds default_max_sample_age_ms = 2000;
+
+// Freshness of one observation. The policy does not know what was measured.
+struct SampleTime {
+    Milliseconds sampled_at{0};
+    bool valid{false};
+};
 
 struct OutputPolicy {
-    Milliseconds max_run_ms{policy_defaults::default_max_run_ms};
-    Milliseconds max_sample_age_ms{policy_defaults::default_max_sample_age_ms};
+    Milliseconds max_run_ms{default_max_run_ms};
+    Milliseconds max_sample_age_ms{default_max_sample_age_ms};
 };
 
 enum class OutputState {
@@ -19,7 +30,7 @@ enum class OutputState {
 class TimedOutput {
     public:
     explicit TimedOutput(OutputPolicy policy) noexcept;
-    bool update(bool requested, Reading reading, Milliseconds now) noexcept;
+    bool update(bool requested, SampleTime sample, Milliseconds now) noexcept;
     bool reset_fault() noexcept;
 
     void trip_fault() noexcept {
@@ -42,4 +53,4 @@ class TimedOutput {
     OutputState state_{OutputState::off};
 };
 
-} // namespace domain
+} // namespace timed_output

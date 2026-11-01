@@ -3,6 +3,7 @@
 #include "drivers/synthetic_sensor.hpp"
 
 #include <gtest/gtest.h>
+#include <limits>
 #include <vector>
 
 namespace {
@@ -97,6 +98,21 @@ TEST(SensorWorker, SensorImplementationCanBeReplacedWithoutChangingWorker) {
     EXPECT_FLOAT_EQ(readings.value.value, 12.0F);
 }
 
+TEST(ControlWorker, NonFiniteSampleFailsClosed) {
+    FakeClock clock;
+    MemorySnapshot<domain::Reading> readings;
+    readings.publish({std::numeric_limits<float>::quiet_NaN(), 0, true});
+    MemorySnapshot<domain::Telemetry> telemetry;
+    Requests requests;
+    requests.enabled = true;
+    drivers::SimulatedOutput output;
+    timed_output::TimedOutput policy({1000, 200});
+    application::ControlWorker worker(policy, clock, readings, requests, output, telemetry);
+    worker.step();
+    EXPECT_FALSE(output.enabled());
+    EXPECT_TRUE(policy.fault());
+}
+
 TEST(ControlWorker, MissingReadingFailsClosed) {
     FakeClock clock;
     MemorySnapshot<domain::Reading> readings;
@@ -104,7 +120,7 @@ TEST(ControlWorker, MissingReadingFailsClosed) {
     Requests requests;
     requests.enabled = true;
     drivers::SimulatedOutput output;
-    domain::TimedOutput policy({1000, 200});
+    timed_output::TimedOutput policy({1000, 200});
     application::ControlWorker worker(policy, clock, readings, requests, output, telemetry);
     worker.step();
     EXPECT_FALSE(output.enabled());
@@ -120,7 +136,7 @@ TEST(ControlWorker, RunsLocallyAndStopsWhenSampleExpires) {
     Requests requests;
     requests.enabled = true;
     drivers::SimulatedOutput output;
-    domain::TimedOutput policy({1000, 200});
+    timed_output::TimedOutput policy({1000, 200});
     application::ControlWorker worker(policy, clock, readings, requests, output, telemetry);
     worker.step();
     ASSERT_TRUE(output.enabled());
@@ -138,7 +154,7 @@ TEST(ControlWorker, OutputFailureLatchesFaultAndAttemptsStop) {
     Requests requests;
     requests.enabled = true;
     FailingOutput output;
-    domain::TimedOutput policy({1000, 200});
+    timed_output::TimedOutput policy({1000, 200});
     application::ControlWorker worker(policy, clock, readings, requests, output, telemetry);
     worker.step();
     EXPECT_EQ(output.calls, (std::vector<bool>{true, false}));
@@ -159,7 +175,7 @@ TEST(ControlWorker, FailedStopIsReportedAsUnknown) {
     requests.enabled = true;
     FailingOutput output;
     output.fail_stop = true;
-    domain::TimedOutput policy({1000, 200});
+    timed_output::TimedOutput policy({1000, 200});
     application::ControlWorker worker(policy, clock, readings, requests, output, telemetry);
     worker.step();
     EXPECT_TRUE(policy.fault());
@@ -179,15 +195,15 @@ TEST(ReporterWorker, ReportsLatestSnapshotAndSkipsMissingData) {
 }
 
 TEST(TimedOutput, StateTransitionsAreExplicit) {
-    domain::TimedOutput policy({1000, 200});
-    EXPECT_EQ(policy.state(), domain::OutputState::off);
-    ASSERT_TRUE(policy.update(true, {42, 0, true}, 0));
-    EXPECT_EQ(policy.state(), domain::OutputState::running);
+    timed_output::TimedOutput policy({1000, 200});
+    EXPECT_EQ(policy.state(), timed_output::OutputState::off);
+    ASSERT_TRUE(policy.update(true, {0, true}, 0));
+    EXPECT_EQ(policy.state(), timed_output::OutputState::running);
     policy.trip_fault();
-    EXPECT_EQ(policy.state(), domain::OutputState::fault);
-    EXPECT_FALSE(policy.update(true, {42, 1, true}, 1));
+    EXPECT_EQ(policy.state(), timed_output::OutputState::fault);
+    EXPECT_FALSE(policy.update(true, {1, true}, 1));
     ASSERT_TRUE(policy.reset_fault());
-    EXPECT_EQ(policy.state(), domain::OutputState::off);
+    EXPECT_EQ(policy.state(), timed_output::OutputState::off);
 }
 
 TEST(ControlWorker, EnforcesRuntimeEvenWhenReporterIsNeverScheduled) {
@@ -197,7 +213,7 @@ TEST(ControlWorker, EnforcesRuntimeEvenWhenReporterIsNeverScheduled) {
     Requests requests;
     requests.enabled = true;
     drivers::SimulatedOutput output;
-    domain::TimedOutput policy({1000, 200});
+    timed_output::TimedOutput policy({1000, 200});
     application::ControlWorker worker(policy, clock, readings, requests, output, telemetry);
     for (domain::Milliseconds now = 0; now <= 1000; now += 100) {
         clock.time = now;

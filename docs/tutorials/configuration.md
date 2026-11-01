@@ -2,7 +2,7 @@
 
 | Location | Owns |
 | --- | --- |
-| `domain/policy_defaults.hpp` | Default maximum runtime and sample age |
+| `timed_output/timed_output.hpp` | Default maximum runtime and sample age |
 | `main/device_config.hpp` | Device periods, task budgets, selected policy, and synthetic value |
 | `platform/constants.hpp` | Queue capacity and time conversions |
 | `configuration/network_config.hpp` | Runtime network and identity fields, and their storage capacities |
