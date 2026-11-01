@@ -4,6 +4,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "timed_output/timed_output.hpp"
 #include "wiring/clock.hpp"
 #include "wiring/snapshot.hpp"
 
@@ -33,7 +34,7 @@ extern "C" void app_main() {
     static LocalEnableRequest requests;
     static wiring::Snapshot<domain::Reading> readings;
     static wiring::Snapshot<domain::Telemetry> telemetry;
-    static domain::TimedOutput policy({max_run_ms, max_sample_age_ms});
+    static timed_output::TimedOutput policy({max_run_ms, max_sample_age_ms});
     static application::SensorWorker sampler(sensor, clock, readings);
     static application::ControlWorker controller(policy, clock, readings, requests, output,
                                                  telemetry);

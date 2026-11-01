@@ -1,0 +1,10 @@
+#include "timed_output/timed_output.hpp"
+#include "unity.h"
+
+TEST_CASE("timed output expires without extending the deadline", "[timed_output]") {
+    timed_output::TimedOutput output({1000, 200});
+    TEST_ASSERT_TRUE(output.update(true, {0, true}, 0));
+    TEST_ASSERT_TRUE(output.update(true, {999, true}, 999));
+    TEST_ASSERT_FALSE(output.update(true, {1000, true}, 1000));
+    TEST_ASSERT_TRUE(output.fault());
+}

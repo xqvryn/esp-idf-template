@@ -8,3 +8,5 @@ dependencies:
     path: "../../../components/networking"
   drivers:
     path: "../../../components/drivers"
+  timed_output:
+    path: "../../../components/timed_output"

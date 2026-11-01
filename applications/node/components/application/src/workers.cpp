@@ -1,5 +1,7 @@
 #include "application/workers.hpp"
 
+#include <cmath>
+
 namespace application {
 
 void SensorWorker::step() noexcept {
@@ -13,7 +15,9 @@ void ControlWorker::step() noexcept {
     }
     const auto now = clock_.now();
     const bool requested = requests_.enable_requested(now);
-    const bool enabled = policy_.update(requested, reading, now);
+    const timed_output::SampleTime sample{reading.sampled_at,
+                                          reading.valid && std::isfinite(reading.value)};
+    const bool enabled = policy_.update(requested, sample, now);
     auto error = output_.set_enabled(enabled);
     auto applied = enabled ? domain::AppliedOutput::on : domain::AppliedOutput::off;
     if (error != domain::OutputError::none) {

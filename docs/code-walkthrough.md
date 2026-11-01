@@ -24,17 +24,18 @@ Settings live in `device_config.hpp` and
 ## 3. Single-step work: application/workers.hpp and workers.cpp
 
 `SensorWorker::step()` reads one sample and publishes it. `ControlWorker::step()`
-reads the latest sample, evaluates `domain::TimedOutput`, applies the result, and
+reads the latest sample, evaluates `timed_output::TimedOutput`, applies the result, and
 publishes status. `ReporterWorker::step()` forwards the latest status to its sink.
 
 A snapshot is a one-slot mailbox: a newer value replaces the old value. It is not
 a command queue or a history. Host tests supply in-memory snapshots and fake clocks.
 
-## 4. Policy: domain/timed_output.hpp and timed_output.cpp
+## 4. Policy: timed_output/timed_output.hpp and timed_output.cpp
 
-The state machine owns off/running/fault transitions. It checks measurement age
-and maximum continuous runtime using the injected monotonic time. It knows nothing
-about GPIO, Wi-Fi, MQTT, or FreeRTOS. Workers own the calls to external ports.
+The state machine owns off/running/fault transitions. It checks sample age and
+maximum continuous runtime using the injected monotonic time. It does not see a
+sensor reading, GPIO, Wi-Fi, MQTT, or FreeRTOS. The control worker turns a
+non-finite measurement into an invalid sample time before calling it.
 
 `decide_boot_health` is a separate pure function in `domain/boot_health.hpp`. It
 confirms a pending boot only after control has completed a step and the applied

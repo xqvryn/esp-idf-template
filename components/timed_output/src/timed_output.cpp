@@ -1,18 +1,15 @@
-#include "domain/timed_output.hpp"
+#include "timed_output/timed_output.hpp"
 
-#include <cmath>
-
-namespace domain {
+namespace timed_output {
 
 TimedOutput::TimedOutput(OutputPolicy policy) noexcept : policy_(policy) {
 }
 
-bool TimedOutput::update(bool requested, Reading reading, Milliseconds now) noexcept {
+bool TimedOutput::update(bool requested, SampleTime sample, Milliseconds now) noexcept {
     const bool invalid = policy_.max_run_ms <= 0 || policy_.max_sample_age_ms <= 0 || now < 0 ||
-                         (has_update_ && now < last_update_) || !reading.valid ||
-                         !std::isfinite(reading.value) || reading.sampled_at < 0 ||
-                         reading.sampled_at > now ||
-                         now - reading.sampled_at > policy_.max_sample_age_ms;
+                         (has_update_ && now < last_update_) || !sample.valid ||
+                         sample.sampled_at < 0 || sample.sampled_at > now ||
+                         now - sample.sampled_at > policy_.max_sample_age_ms;
     has_update_ = true;
     last_update_ = now;
     if (invalid || (state_ == OutputState::running && now - started_at_ >= policy_.max_run_ms)) {
@@ -40,4 +37,4 @@ bool TimedOutput::reset_fault() noexcept {
     return true;
 }
 
-} // namespace domain
+} // namespace timed_output

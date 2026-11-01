@@ -66,7 +66,7 @@ This is a lightweight boundary check, not a general C++ dependency analyzer.
 | Composition root | `main/device.cpp` selects and owns concrete implementations |
 | Adapter | ESP-IDF I2C/clock and FreeRTOS implement portable application ports |
 | Strategy | Sensor/output ports allow synthetic and physical implementations |
-| State machine | `domain::TimedOutput` explicitly tracks off/running/fault |
+| State machine | `timed_output::TimedOutput` explicitly tracks off/running/fault |
 | Service lifecycle | Network phases and `NetworkState`; stop releases resources in reverse order |
 | Producer-consumer | Bounded latest-value queues connect workers |
 | Bounded FIFO with rejection | Command ingress returns a status instead of overwriting or blocking |
@@ -171,7 +171,7 @@ See [Safety](safety.md) and [ADR 0005](decisions/0005-command-ingress.md).
 
 - `main/device_config.hpp`: sampling periods, task stacks/priorities, command queue depths, and selected policy.
 - `main/boards/esp32s3/board_config.hpp`: GPIO and bus settings, exposed by `main/Kconfig.projbuild`.
-- `domain/policy_defaults.hpp`: reusable safe-policy defaults, overridable through `OutputPolicy`.
+- `timed_output/timed_output.hpp`: reusable run-time and sample-age defaults, overridable through `OutputPolicy`.
 - `platform/constants.hpp`: queue capacity and time conversions, not deployment task budgets.
 - Driver `.cpp` files: fixed protocol commands, CRC values, and timing requirements.
 - Runtime NVS: validated network credentials and identity, schema 1, with in-memory migration; see [Hardware and MQTT](hardware-mqtt.md) and [ADR 0006](decisions/0006-versioned-settings.md).

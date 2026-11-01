@@ -1,0 +1,6 @@
+version: "0.1.0"
+description: "Timed output state machine with a maximum run and sample age"
+url: "https://github.com/xqvryn/esp-idf-template"
+license: "MIT"
+dependencies:
+  idf: ">=5.4"

@@ -127,10 +127,10 @@ struct Loop {
     MemorySnapshot<domain::Reading> readings;
     MemorySnapshot<domain::Telemetry> telemetry;
     drivers::SimulatedOutput output;
-    domain::TimedOutput policy;
+    timed_output::TimedOutput policy;
     application::ControlWorker worker;
 
-    Loop(application::CommandRequests& requests, domain::OutputPolicy output_policy)
+    Loop(application::CommandRequests& requests, timed_output::OutputPolicy output_policy)
         : policy(output_policy), worker(policy, clock, readings, requests, output, telemetry) {
     }
 };
@@ -445,7 +445,7 @@ TEST(CommandIngress, OutputFaultRejectsTheCommandWithoutAResetPath) {
     MemorySnapshot<domain::Reading> readings;
     MemorySnapshot<domain::Telemetry> telemetry;
     FailingOutput output;
-    domain::TimedOutput policy({1000, 10000});
+    timed_output::TimedOutput policy({1000, 10000});
     application::ControlWorker worker(policy, clock, readings, path.requests, output, telemetry);
     EXPECT_EQ(path.ingress.submit(command_for(1, 1, 0, 300), 0), domain::CommandStatus::accepted);
     readings.publish({42.0F, 0, true});

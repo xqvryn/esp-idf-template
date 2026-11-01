@@ -1,7 +1,7 @@
 #pragma once
 
 #include "application/ports/device.hpp"
-#include "domain/timed_output.hpp"
+#include "timed_output/timed_output.hpp"
 
 namespace application {
 
@@ -22,7 +22,7 @@ class SensorWorker final : public Work {
 
 class ControlWorker final : public Work {
     public:
-    ControlWorker(domain::TimedOutput& policy, Clock& clock,
+    ControlWorker(timed_output::TimedOutput& policy, Clock& clock,
                   const SnapshotReader<domain::Reading>& readings, RequestSource& requests,
                   OutputSink& output, SnapshotWriter<domain::Telemetry>& telemetry)
         : policy_(policy), clock_(clock), readings_(readings), requests_(requests), output_(output),
@@ -32,7 +32,7 @@ class ControlWorker final : public Work {
     void step() noexcept override;
 
     private:
-    domain::TimedOutput& policy_;
+    timed_output::TimedOutput& policy_;
     Clock& clock_;
     const SnapshotReader<domain::Reading>& readings_;
     RequestSource& requests_;

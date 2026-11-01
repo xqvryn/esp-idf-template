@@ -2,9 +2,9 @@
 #include "application/command_path.hpp"
 #include "application/telemetry_codec.hpp"
 #include "configuration/network_config.hpp"
-#include "domain/policy_defaults.hpp"
 #include "networking/payload.hpp"
 #include "networking/telemetry.hpp"
+#include "timed_output/timed_output.hpp"
 
 #include <array>
 #include <cstring>
@@ -153,10 +153,9 @@ template <std::size_t Commands = 4, std::size_t Results = 4> struct EnvelopePath
     MemorySnapshot<application::StopNotice> stops;
     application::CommandIngress ingress;
 
-    explicit EnvelopePath(
-        bool remote = true,
-        domain::CommandLimits limits = {domain::policy_defaults::default_max_run_ms,
-                                        domain::command_defaults::max_ttl_ms})
+    explicit EnvelopePath(bool remote = true,
+                          domain::CommandLimits limits = {timed_output::default_max_run_ms,
+                                                          domain::command_defaults::max_ttl_ms})
         : ingress(commands, results, stops, limits, remote) {
     }
 };

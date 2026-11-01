@@ -1,14 +1,5 @@
 #include "domain/command.hpp"
-#include "domain/timed_output.hpp"
 #include "unity.h"
-
-TEST_CASE("timed output expires without extending the deadline", "[domain]") {
-    domain::TimedOutput output({1000, 200});
-    TEST_ASSERT_TRUE(output.update(true, {42.0F, 0, true}, 0));
-    TEST_ASSERT_TRUE(output.update(true, {42.0F, 999, true}, 999));
-    TEST_ASSERT_FALSE(output.update(true, {42.0F, 1000, true}, 1000));
-    TEST_ASSERT_TRUE(output.fault());
-}
 
 TEST_CASE("command validation rejects expired, over-long, and remote requests", "[domain]") {
     const domain::CommandLimits limits{1000, 15000};

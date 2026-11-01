@@ -39,7 +39,7 @@ Classification of the code that exists today:
 | Networking (Wi-Fi, SNTP, MQTT client, link lifecycle) | Optional component `components/networking` |
 | Storage (validated settings and NVS) | Optional component `components/configuration` |
 | Sensor driver, for example SHT3x | Optional component `components/drivers`. It returns its own sample type |
-| Output policy `TimedOutput` | Reusable within the sensor-node `domain` component. Not required by infrastructure |
+| Output policy `TimedOutput` | Reusable component `components/timed_output`. It sees a sample time, not a sensor `Reading` |
 | Irrigation policy | Smart-farm application only. Not in this template |
 | Application workers, command ingress, quiesce, telemetry JSON, command envelope | Sensor/actuator application under `applications/node/` |
 | Synthetic sensor and simulated output | That same application (`node_drivers`), not the reusable driver |
@@ -84,9 +84,8 @@ Breaking source adjustments inside this repository:
 - Component manifests live next to `platform`, `configuration`, `networking`,
   and `drivers`. Examples consume them with path dependencies. They are not
   uploaded to the component registry. See [Use ESPKit](../using-espkit.md).
-- `TimedOutput::update` still takes `Reading`. Split that policy from
-  measurement types only when a second application needs the state machine
-  without the sensor node.
+- `TimedOutput` is `components/timed_output` and does not include `Reading`.
+  The control worker turns a non-finite measurement into an invalid sample time.
 - `LogTelemetry` stays in node wiring. It prints sensor status. General logging
   remains `ESP_LOG`.
 - Application profiles are selected with `-DESPKIT_PROFILE=minimal|sensor|actuator`.

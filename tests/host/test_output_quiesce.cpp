@@ -116,10 +116,10 @@ struct Loop {
     MemorySnapshot<domain::Reading> readings;
     MemorySnapshot<domain::Telemetry> telemetry;
     drivers::SimulatedOutput output;
-    domain::TimedOutput policy;
+    timed_output::TimedOutput policy;
     application::ControlWorker worker;
 
-    Loop(application::CommandRequests& requests, domain::OutputPolicy output_policy)
+    Loop(application::CommandRequests& requests, timed_output::OutputPolicy output_policy)
         : policy(output_policy), worker(policy, clock, readings, requests, output, telemetry) {
     }
 };
@@ -129,7 +129,7 @@ struct FailingLoop {
     MemorySnapshot<domain::Reading> readings;
     MemorySnapshot<domain::Telemetry> telemetry;
     OffFails output;
-    domain::TimedOutput policy;
+    timed_output::TimedOutput policy;
     application::ControlWorker worker;
 
     explicit FailingLoop(application::CommandRequests& requests)
