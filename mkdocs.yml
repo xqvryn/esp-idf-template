@@ -1,57 +1,130 @@
 site_name: ESPKit
-site_description: A portable C++20 foundation for ESP32 devices, sensors, and actuators.
-repo_url: !ENV [REPOSITORY_URL, 'https://github.com/nawuv/esp-idf-template']
+site_description: A project template and optional components for ESP-IDF 5.4.2 firmware.
+repo_url: !ENV [REPOSITORY_URL, 'https://github.com/xqvryn/esp-idf-template']
+repo_name: xqvryn/esp-idf-template
 edit_uri: edit/develop/docs/
 strict: true
 theme:
-  name: mkdocs
-  color_mode: auto
-  nav_style: dark
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+    - content.action.view
 plugins:
   - search
 markdown_extensions:
   - admonition
-  - fenced_code
+  - attr_list
+  - md_in_html
   - tables
   - toc:
       permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path:
+        - .
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/xqvryn/esp-idf-template
+      name: ESPKit on GitHub
 extra_css:
   - stylesheets/extra.css
 nav:
   - Home: index.md
-  - Get Started:
-      - Installation: getting-started/installation.md
-      - Use ESPKit: using-espkit.md
-      - Create Your Project: getting-started/create-project.md
-      - Build and Run: getting-started/build-and-run.md
+  - Getting started:
+      - Start here: getting-started/index.md
+      - Install ESP-IDF: getting-started/installation.md
+      - Create a project: getting-started/create-project.md
+      - Build and run: getting-started/build-and-run.md
       - Troubleshooting: getting-started/troubleshooting.md
-      - Hardware and MQTT: hardware-mqtt.md
-  - Architecture:
-      - Overview: architecture.md
-      - Code Walkthrough: code-walkthrough.md
-      - Board Porting: board-porting.md
+  - Concepts:
+      - Architecture: concepts/architecture.md
+      - Dependency rules: architecture.md
+      - Boundaries: concepts/boundaries.md
+      - Three axes: concepts/axes.md
+      - Code walkthrough: code-walkthrough.md
       - Safety: safety.md
-      - MQTT Contract: mqtt-contract.md
-      - Cluster and Swarm: distributed-systems.md
-  - Tutorials:
-      - Replace a Sensor: tutorials/replace-sensor.md
-      - Add an Output: tutorials/add-output.md
-      - Configure Your Device: tutorials/configuration.md
-  - Examples: examples.md
-  - Testing: testing.md
-  - Project:
-      - Contributing: contributing.md
-      - Fork Workflow: development-workflow.md
-      - Releases and Branches: releases.md
-      - Repository Setup: repository-setup.md
+      - MQTT contract: mqtt-contract.md
+      - Cluster and swarm: distributed-systems.md
+  - Guides:
+      - Build profiles: guides/profiles.md
+      - Use the components: guides/components.md
+      - Board porting: board-porting.md
+      - Testing: testing.md
+      - CI and releases: guides/releases.md
+      - Release details: releases.md
+      - Repository setup: repository-setup.md
+      - Fork workflow: development-workflow.md
+      - Hardware and MQTT: hardware-mqtt.md
+  - Components:
+      - Overview: components/index.md
+      - Platform: components/platform.md
+      - Configuration: components/configuration.md
+      - Networking: components/networking.md
+      - Drivers: components/drivers.md
+      - Timed output: components/timed-output.md
+  - Examples:
+      - Overview: examples.md
+      - Minimal: examples/minimal.md
+      - Networking: examples/networking.md
+      - Sensor node: examples/sensor-node.md
+      - Actuator node: examples/actuator-node.md
+      - Simulation: examples/simulation.md
+  - Decisions:
+      - Portable control: decisions/0001-portable-control-and-simulation.md
+      - Injected workers: decisions/0002-injected-workers-and-composition.md
+      - Layered components: decisions/0003-layered-components.md
+      - Portable component API: decisions/0004-portable-component-api.md
+      - Command ingress: decisions/0005-command-ingress.md
+      - Versioned settings: decisions/0006-versioned-settings.md
+      - Service lifecycle: decisions/0007-service-lifecycle.md
+      - Output quiesce: decisions/0008-output-quiesce.md
+      - Application composition: decisions/0009-application-composition.md
+  - Changelog: changelog.md
+  - Contributing:
+      - How to contribute: contributing.md
       - Roadmap: roadmap.md
-      - Decisions:
-          - Portable Control: decisions/0001-portable-control-and-simulation.md
-          - Injected Workers: decisions/0002-injected-workers-and-composition.md
-          - Layered Components: decisions/0003-layered-components.md
-          - Portable Component API: decisions/0004-portable-component-api.md
-          - Command Ingress: decisions/0005-command-ingress.md
-          - Versioned Settings: decisions/0006-versioned-settings.md
-          - Service Lifecycle: decisions/0007-service-lifecycle.md
-          - Output Quiesce: decisions/0008-output-quiesce.md
-          - Application Composition: decisions/0009-application-composition.md
+      - Replace a sensor: tutorials/replace-sensor.md
+      - Add an output: tutorials/add-output.md
+      - Configure a device: tutorials/configuration.md

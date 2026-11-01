@@ -1,55 +1,67 @@
-# Build your next ESP32 device
+# ESPKit
 
-<div class="hero">
-<p class="eyebrow">ESP-IDF · C++20 · FreeRTOS</p>
-<p class="hero-lead">Start small. Keep control local. Grow through replaceable components.</p>
-<p>A reusable firmware foundation for sensor nodes, actuators, and your first smart-farm controller.</p>
-</div>
+<p class="espkit-lead">ESPKit is a small ESP-IDF 5.4.2 starting point for ESP32-S3 firmware. Use the whole repository as a project template, or depend on only the components you need.</p>
 
-[Use this template](https://github.com/nawuv/esp-idf-template/generate) · [Get started](getting-started/installation.md) · [Explore examples](examples.md) · [Understand the architecture](architecture.md)
+ESPKit has three roles. They share one build, test, and documentation setup. They are not three copies of the same application.
 
-## Your first working loop
-
-```text
-Sensor → latest reading → local control → output adapter
-                              ↓
-                         status reporter
+```mermaid
+flowchart LR
+  subgraph template [Project template]
+    build[CMake and CI]
+    tests[Host tests]
+  end
+  subgraph parts [Reusable components]
+    platform[platform]
+    storage[configuration]
+    net[networking]
+    drivers[drivers]
+    policy[timed_output]
+  end
+  subgraph apps [Examples]
+    minimal[minimal]
+    networking[networking]
+    sensor[sensor node]
+    actuator[actuator node]
+  end
+  template --> parts
+  template --> apps
+  net --> storage
 ```
 
-The starter samples a synthetic sensor, evaluates local safety rules, and reports
-status independently. It never touches GPIO and needs no Wi-Fi password or server.
+<div class="grid cards" markdown>
 
-## Choose your path
+-   :material-source-repository: **Project template**
 
-| You want to… | Start here |
+    Copy the repository when you want CMake, CI, formatting, and docs in a new project.
+
+    [:octicons-arrow-right-24: Start from the template](getting-started/index.md)
+
+-   :material-puzzle: **Reusable components**
+
+    Pin `platform`, `configuration`, `networking`, `drivers`, or `timed_output` from an existing ESP-IDF project.
+
+    [:octicons-arrow-right-24: Use a component](guides/components.md)
+
+-   :material-flask: **Examples**
+
+    Build a hello-world app, a networking-only app, or the sensor and actuator demos.
+
+    [:octicons-arrow-right-24: Open the examples](examples.md)
+
+</div>
+
+## What you can build today
+
+The default root firmware is a **sensor** profile. It samples a synthetic reading, runs a local timed-output policy, and logs status. It does not drive a GPIO output and it does not need Wi-Fi credentials.
+
+!!! warning "Do not connect a live pump"
+    The examples keep outputs in memory. A successful compile is not a hardware test and not permission to drive an actuator. Read [Safety](safety.md) before you add a real output.
+
+| If you want to… | Start here |
 | --- | --- |
-| Build and run your first firmware | [Quick start](getting-started/build-and-run.md) |
-| Understand dependency injection | [Architecture](architecture.md) |
-| Replace the synthetic sensor | [Sensor tutorial](tutorials/replace-sensor.md) |
-| Explore timed output control | [Actuator example](examples.md#actuator-node) |
-| Plan a cluster or swarm | [Distributed evolution](distributed-systems.md) |
+| Create a new private repository from this template | [Getting started](getting-started/index.md) |
+| Compile the smallest application for ESP32-S3 | [Minimal example](examples/minimal.md) |
+| See how profiles differ from the chip and the board | [Three axes](concepts/axes.md) |
+| Depend on networking without the sensor workers | [Networking example](examples/networking.md) |
 
-## What works today
-
-Status: **pre-alpha**, with hardware acceptance testing still pending.
-
-- ESP32-S3 builds with the pinned ESP-IDF 5.4.2 baseline.
-- Constructor-injected workers and explicit output states.
-- Bounded latest-value queues, a rejecting command FIFO, and independent task scheduling.
-- Host tests, a Unity test application, and standalone example projects, including a minimal application with no sensor or network components.
-- Optional [SHT3x, Wi-Fi, and MQTT](hardware-mqtt.md) with versioned NVS credentials.
-  A failed network start can be released and retried without rebooting local control.
-- English documentation, formatting checks, and configurable release automation.
-
-## What comes next
-
-Physical actuator drivers, MQTT command subscription, secure provisioning, and OTA
-execution remain [roadmap items](roadmap.md). Stored network settings migrate in
-memory across schema versions and are not rewritten in NVS. Local command admission
-is implemented and defaults to an idle, remote-rejected ingress. A portable helper
-can confirm applied OFF before a disruptive restart; boot does not call it. OTA
-partitions are reserved in the root firmware, but an updater is not implemented. Cluster coordination and robot
-motion algorithms are not included.
-
-Read [Safety](safety.md) before adding real outputs. A successful build does not
-mean a board or connected actuator has been validated.
+Status is **pre-alpha**. Host tests and ESP32-S3 builds run in CI. Live Wi-Fi, broker, and board acceptance tests are still pending. OTA download, MQTT command subscription, and physical actuator drivers are not implemented.

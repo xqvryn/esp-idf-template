@@ -40,7 +40,7 @@ when the application calls it.
 The examples in this repository consume `platform`, `configuration`,
 `networking`, and `drivers` through `idf_component.yml` path dependencies.
 An external project uses the same manifest with a `git` dependency. See
-`docs/using-espkit.md`.
+`docs/guides/components.md`.
 
 You can also point `EXTRA_COMPONENT_DIRS` at a component directory. From
 `examples/minimal/CMakeLists.txt`, before `project()`:

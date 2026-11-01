@@ -13,17 +13,18 @@ mirror their owning namespace. Check for SDK component collisions when adding na
 | --- | --- | --- |
 | `platform` | `platform` | Optional ESP-IDF clock, I2C, and FreeRTOS queue/task primitives |
 | `configuration` | `configuration` | Optional NVS storage, settings validation, and schema migration |
-| `networking` | `networking` | Optional Wi-Fi, SNTP, MQTT client, connection lifecycle, and command envelopes |
+| `networking` | `networking` | Optional Wi-Fi, SNTP, MQTT client, and connection lifecycle. Payloads stay opaque |
 | `drivers` | `drivers` | Optional SHT3x measurement. The driver does not know about node workers |
-| `domain` | `domain` | Sensor-node measurements, status, timed-output policy, command checks, and boot health |
+| `timed_output` | `timed_output` | Off, running, and fault. It sees a sample time, not a sensor `Reading` |
+| `domain` | `domain` | Sensor-node measurements, status, command checks, and boot health |
 | `application` | `application` | Sensor-node ports, workers, command ingress, quiesce, and telemetry JSON |
 | `node_drivers` | `drivers` | Synthetic input and simulated output for the sensor/actuator examples |
 | `wiring` | `wiring` | Adapts platform primitives to the sensor-node ports on device |
 | `main/` | `device` | Product selection, board settings, task budgets, and object wiring |
 
-`platform`, `configuration`, and `drivers` live in `components/` and do not
-include the sensor-node application. `networking` does not either: inbound
-MQTT bytes stay opaque. `domain`, `application`,
+`platform`, `configuration`, `networking`, `drivers`, and `timed_output` live in
+`components/` and do not include the sensor-node application. Inbound MQTT bytes
+stay opaque. `domain`, `application`,
 `node_drivers`, and `wiring` live in `applications/node/components/` and are
 added only by projects that use that execution model.
 `drivers::Sht3xSensor` is declared in `components/drivers/include/drivers/sht3x.hpp`.
@@ -41,6 +42,7 @@ main (sensor-node composition)
   ├── wiring ──────────────> platform
   ├── node_drivers ────────> application ──> domain
   ├── drivers (SHT3x)
+  ├── timed_output
   └── networking ──────────> configuration
 
 minimal application
@@ -49,7 +51,7 @@ minimal application
 
 Domain, application, node_drivers, and the SHT3x driver contain no
 ESP-IDF/FreeRTOS headers. Domain has no dependency on application. `platform`,
-`configuration`, and `drivers` do not include `domain` or `application`.
+`configuration`, `drivers`, and `timed_output` do not include `domain` or `application`.
 Networking depends on configuration. Inbound MQTT bytes are a raw payload
 hook. `application::decode_command_envelope` calls `CommandIngress` and lives
 with the node application, so networking does not. Wiring adapts platform
