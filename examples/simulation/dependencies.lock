@@ -6,7 +6,7 @@ dependencies:
     source:
       path: ../../components/configuration
       type: local
-    version: 0.1.0
+    version: 3.0.0
   drivers:
     dependencies:
     - name: idf
@@ -14,7 +14,7 @@ dependencies:
     source:
       path: ../../components/drivers
       type: local
-    version: 0.1.0
+    version: 3.0.0
   idf:
     source:
       type: idf
@@ -25,11 +25,11 @@ dependencies:
       version: '>=5.4'
     - name: configuration
       path: ../configuration
-      version: 0.1.0
+      version: 3.0.0
     source:
       path: ../../components/networking
       type: local
-    version: 0.1.0
+    version: 3.0.0
   platform:
     dependencies:
     - name: idf
@@ -37,7 +37,7 @@ dependencies:
     source:
       path: ../../components/platform
       type: local
-    version: 0.1.0
+    version: 3.0.0
   timed_output:
     dependencies:
     - name: idf
@@ -45,7 +45,7 @@ dependencies:
     source:
       path: ../../components/timed_output
       type: local
-    version: 0.1.0
+    version: 3.0.0
 direct_dependencies:
 - configuration
 - drivers

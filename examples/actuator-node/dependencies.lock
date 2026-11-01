@@ -10,7 +10,7 @@ dependencies:
     source:
       path: ../../components/platform
       type: local
-    version: 0.1.0
+    version: 3.0.0
   timed_output:
     dependencies:
     - name: idf
@@ -18,7 +18,7 @@ dependencies:
     source:
       path: ../../components/timed_output
       type: local
-    version: 0.1.0
+    version: 3.0.0
 direct_dependencies:
 - idf
 - platform

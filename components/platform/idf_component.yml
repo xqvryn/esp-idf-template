@@ -1,4 +1,4 @@
-version: "0.1.0"
+version: "3.0.0"
 description: "ESP-IDF clock, I2C, and FreeRTOS queue/task primitives"
 url: "https://github.com/xqvryn/esp-idf-template"
 license: "MIT"
