@@ -10,6 +10,10 @@ idf.py -p /dev/ttyACM0 flash monitor
 
 Replace the port with your board's actual port. ESP-IDF monitor exits with `Ctrl+]`.
 The root firmware uses the custom 4 MiB layout with two reserved OTA app slots.
+The default application profile is `sensor` (sample, local control, and
+reporting). Select another with `idf.py -DESPKIT_PROFILE=minimal build` or
+`idf.py -DESPKIT_PROFILE=actuator build` at configure time. That flag is not
+the chip target and not a board profile. See [Build profiles](../guides/profiles.md).
 
 ## Expected output
 

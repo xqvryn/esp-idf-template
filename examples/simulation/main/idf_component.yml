@@ -1,2 +1,12 @@
 dependencies:
   idf: "==5.4.2"
+  platform:
+    path: "../../../components/platform"
+  configuration:
+    path: "../../../components/configuration"
+  networking:
+    path: "../../../components/networking"
+  drivers:
+    path: "../../../components/drivers"
+  timed_output:
+    path: "../../../components/timed_output"

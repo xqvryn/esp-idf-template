@@ -1,8 +1,10 @@
 #pragma once
 
-#include "domain/timed_output.hpp"
+#include "domain/command.hpp"
 #include "domain/types.hpp"
+#include "timed_output/timed_output.hpp"
 
+#include <cstddef>
 #include <cstdint>
 
 namespace device::defaults {
@@ -17,7 +19,11 @@ inline constexpr unsigned sensor_priority = 3;
 inline constexpr unsigned control_priority = 4;
 inline constexpr unsigned reporter_priority = 2;
 
-inline constexpr domain::OutputPolicy output_policy{};
+inline constexpr timed_output::OutputPolicy output_policy{};
+inline constexpr std::size_t command_queue_capacity = 4;
+inline constexpr std::size_t command_result_capacity = 16;
+inline constexpr domain::CommandLimits command_limits{output_policy.max_run_ms,
+                                                      domain::command_defaults::max_ttl_ms};
 inline constexpr float synthetic_reading = 42.0F;
 inline constexpr domain::Milliseconds network_period_ms = 1000;
 inline constexpr domain::Milliseconds sensor_period_ms = 500;

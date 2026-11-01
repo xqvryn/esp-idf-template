@@ -1,10 +1,58 @@
 dependencies:
+  configuration:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/configuration
+      type: local
+    version: 3.0.0
+  drivers:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/drivers
+      type: local
+    version: 3.0.0
   idf:
     source:
       type: idf
     version: 5.4.2
+  networking:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    - name: configuration
+      path: ../configuration
+      version: 3.0.0
+    source:
+      path: ../../components/networking
+      type: local
+    version: 3.0.0
+  platform:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/platform
+      type: local
+    version: 3.0.0
+  timed_output:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/timed_output
+      type: local
+    version: 3.0.0
 direct_dependencies:
+- configuration
+- drivers
 - idf
-manifest_hash: 0af006de1382a4773e692a2746dcf7899032096980c4a273b67f7be5b4ee5052
+- networking
+- platform
+- timed_output
+manifest_hash: e0b8af2a4ae6c414a7273b4b76aab4ebe1501fa041588a30067ad2be6160502f
 target: esp32s3
 version: 2.0.0

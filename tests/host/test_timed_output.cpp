@@ -1,23 +1,22 @@
-#include "domain/timed_output.hpp"
+#include "timed_output/timed_output.hpp"
 
 #include <gtest/gtest.h>
-#include <limits>
 
 namespace {
 
-domain::Reading fresh(domain::Milliseconds now) {
-    return {42.0F, now, true};
+timed_output::SampleTime fresh(timed_output::Milliseconds now) {
+    return {now, true};
 }
 
 TEST(TimedOutput, StartsOffAndAcceptsLocalRequest) {
-    domain::TimedOutput output({1000, 200});
+    timed_output::TimedOutput output({1000, 200});
     EXPECT_FALSE(output.update(false, fresh(0), 0));
     EXPECT_TRUE(output.update(true, fresh(100), 100));
     EXPECT_FALSE(output.update(false, fresh(150), 150));
 }
 
 TEST(TimedOutput, RepeatedRequestsDoNotExtendDeadline) {
-    domain::TimedOutput output({1000, 200});
+    timed_output::TimedOutput output({1000, 200});
     ASSERT_TRUE(output.update(true, fresh(10), 10));
     EXPECT_TRUE(output.update(true, fresh(1009), 1009));
     EXPECT_FALSE(output.update(true, fresh(1010), 1010));
@@ -26,7 +25,7 @@ TEST(TimedOutput, RepeatedRequestsDoNotExtendDeadline) {
 }
 
 TEST(TimedOutput, StaleReadingStopsAndLatchesFault) {
-    domain::TimedOutput output({1000, 200});
+    timed_output::TimedOutput output({1000, 200});
     ASSERT_TRUE(output.update(true, fresh(0), 0));
     EXPECT_FALSE(output.update(true, fresh(0), 201));
     EXPECT_FALSE(output.update(true, fresh(202), 202));
@@ -35,38 +34,35 @@ TEST(TimedOutput, StaleReadingStopsAndLatchesFault) {
 }
 
 TEST(TimedOutput, InvalidAndFutureSamplesFailClosed) {
-    domain::TimedOutput invalid({1000, 200});
-    EXPECT_FALSE(invalid.update(true, {42, 0, false}, 0));
+    timed_output::TimedOutput invalid({1000, 200});
+    EXPECT_FALSE(invalid.update(true, {0, false}, 0));
     EXPECT_TRUE(invalid.fault());
-    domain::TimedOutput future({1000, 200});
+    timed_output::TimedOutput future({1000, 200});
     EXPECT_FALSE(future.update(true, fresh(10), 0));
     EXPECT_TRUE(future.fault());
-    domain::TimedOutput nan({1000, 200});
-    EXPECT_FALSE(nan.update(true, {std::numeric_limits<float>::quiet_NaN(), 0, true}, 0));
-    EXPECT_TRUE(nan.fault());
 }
 
 TEST(TimedOutput, ClockRegressionFailsClosed) {
-    domain::TimedOutput output({1000, 200});
+    timed_output::TimedOutput output({1000, 200});
     ASSERT_TRUE(output.update(true, fresh(100), 100));
     EXPECT_FALSE(output.update(true, fresh(99), 99));
     EXPECT_TRUE(output.fault());
 }
 
 TEST(TimedOutput, FaultCannotBeResetWhileRunning) {
-    domain::TimedOutput output({1000, 200});
+    timed_output::TimedOutput output({1000, 200});
     ASSERT_TRUE(output.update(true, fresh(0), 0));
     EXPECT_FALSE(output.reset_fault());
 }
 
 TEST(TimedOutput, InvalidPolicyFailsClosed) {
-    domain::TimedOutput output({0, 200});
+    timed_output::TimedOutput output({0, 200});
     EXPECT_FALSE(output.update(true, fresh(0), 0));
     EXPECT_TRUE(output.fault());
 }
 
 TEST(TimedOutput, SampleAgeBoundaryIsInclusive) {
-    domain::TimedOutput output({1000, 200});
+    timed_output::TimedOutput output({1000, 200});
     EXPECT_TRUE(output.update(true, fresh(0), 200));
     EXPECT_FALSE(output.update(true, fresh(0), 201));
 }

@@ -1,2 +1,6 @@
 dependencies:
   idf: "==5.4.2"
+  platform:
+    path: "../../../components/platform"
+  timed_output:
+    path: "../../../components/timed_output"

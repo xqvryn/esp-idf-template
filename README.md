@@ -12,8 +12,9 @@ Implemented:
 - Constructor-injected workers with no ESP-IDF dependencies.
 - Explicit output state machine and hardware-error feedback with GoogleTest coverage.
 - Separate FreeRTOS sensor, control, and reporting tasks with bounded queues.
+- Portable command ingress with explicit rejection. Remote admission is off by default.
 - Safe default firmware: synthetic input, simulated output, and networking disabled.
-- Optional SHT3x-DIS I2C driver and Wi-Fi/MQTT status reporting with runtime NVS settings.
+- Optional SHT3x-DIS I2C driver and Wi-Fi/MQTT status reporting with versioned NVS settings.
 - ESP32-S3 build workflow and host test workflow.
 - Unity target-test application (execution requires hardware).
 - A 4 MiB flash layout reserving two OTA application slots.
@@ -21,8 +22,8 @@ Implemented:
 - Same-run firmware bundles with checksums and source manifests.
 - Opt-in GitHub Pages deployment and semantic-release on validated main pushes.
 
-Planned: physical actuator drivers, remote command handling, secure provisioning,
-configuration migration, OTA execution, hardware acceptance tests, and smart-farm automation.
+Planned: physical actuator drivers, MQTT command subscription, secure provisioning,
+OTA execution, hardware acceptance tests, and smart-farm automation.
 These features are not implemented by placeholder folders.
 
 **Do not connect this starter firmware to a live pump.** Hardware output control
@@ -64,15 +65,15 @@ bash tools/test-host.sh
 | Path | Responsibility |
 | --- | --- |
 | `main/` | Entry point, concrete wiring, board settings, and task budgets |
-| `components/domain/` | Portable measurements, status, and safety policy |
-| `components/application/` | Portable ports and workers |
-| `components/drivers/` | Synthetic/SHT3x sensors and simulated output |
-| `components/platform/` | ESP-IDF I2C, FreeRTOS scheduling/queues, clock, and logs |
-| `components/configuration/` | Validated runtime NVS network settings |
-| `components/networking/` | Wi-Fi, MQTT telemetry, and connection coordination |
+| `components/platform/` | Optional ESP-IDF clock, I2C, and FreeRTOS primitives |
+| `components/configuration/` | Optional validated NVS settings |
+| `components/networking/` | Optional Wi-Fi, SNTP, and MQTT lifecycle |
+| `components/drivers/` | Optional SHT3x driver |
+| `components/timed_output/` | Optional timed-output policy, independent of sensor readings |
+| `applications/node/` | Sensor/actuator domain, workers, simulated drivers, and device wiring |
 | `tests/host/` | GoogleTest tests built without ESP-IDF |
 | `docs/` | Architecture, protocols, safety, and roadmap |
-| `examples/` | Three standalone simulation projects |
+| `examples/` | Minimal, networking, simulation, sensor-node, and actuator-node projects |
 | `.github/workflows/` | Tests, example builds, docs, and opt-in deployment/release |
 
 See [Hardware and MQTT](docs/hardware-mqtt.md) for optional real sensor/network setup,
@@ -84,7 +85,7 @@ and [Roadmap](docs/roadmap.md).
 
 ## Documentation and examples
 
-Read [Getting Started](docs/getting-started/installation.md), [Examples](docs/examples.md),
+Read [Getting Started](docs/getting-started/index.md), [Examples](docs/examples.md),
 and [Releases and Branches](docs/releases.md). Preview the English site locally:
 
 ```sh
@@ -94,8 +95,10 @@ python -m pip install -r requirements-docs.txt
 mkdocs serve
 ```
 
-Standalone projects live in `examples/simulation`, `examples/sensor-node`, and
-`examples/actuator-node`. Each has its own README and is compiled in CI.
+Standalone projects live in `examples/minimal`, `examples/simulation`,
+`examples/sensor-node`, and `examples/actuator-node`. Each has its own README
+and is compiled in CI. `examples/minimal` does not use the sensor/actuator
+components.
 
 Development flows through `feature/* -> develop -> main`. Keep main as the stable
 template default. CI builds and tests without secrets. Set `ENABLE_PAGES=true` and/or
@@ -104,6 +107,15 @@ template default. CI builds and tests without secrets. Set `ENABLE_PAGES=true` a
 until configured. Main and develop pushes evaluate stable/dev releases after all checks; docs-only changes
 normally do not create a new version. `ci-required` aggregates all validation results.
 Firmware versions are calculated before compilation and checked again before publication.
+
+## Two ways to use this repository
+
+Copy it as a GitHub template when you want the build, CI, and tests in a new
+repository. Depend on individual components when an existing project should pin
+the same networking, storage, or driver sources. The template copy does not
+receive later upstream commits. The component manifests are ready to publish
+and are not uploaded to the component registry. See
+[Use the components](docs/guides/components.md).
 
 ## Customize
 

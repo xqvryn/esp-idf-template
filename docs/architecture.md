@@ -11,16 +11,23 @@ mirror their owning namespace. Check for SDK component collisions when adding na
 
 | Component | Namespace | Responsibility |
 | --- | --- | --- |
-| `domain` | `domain` | Measurements, status, and timed-output safety policy |
-| `application` | `application` | Portable ports and single-step workers |
-| `drivers` | `drivers` | Synthetic/SHT3x inputs and simulated output |
-| `platform` | `platform` | ESP-IDF I2C, monotonic clock, FreeRTOS queues/tasks, log sink |
-| `configuration` | `configuration` | Network settings validation and NVS loading |
-| `networking` | `networking` | Wi-Fi lifecycle, MQTT telemetry, and connection coordination |
+| `platform` | `platform` | Optional ESP-IDF clock, I2C, and FreeRTOS queue/task primitives |
+| `configuration` | `configuration` | Optional NVS storage, settings validation, and schema migration |
+| `networking` | `networking` | Optional Wi-Fi, SNTP, MQTT client, and connection lifecycle. Payloads stay opaque |
+| `drivers` | `drivers` | Optional SHT3x measurement. The driver does not know about node workers |
+| `timed_output` | `timed_output` | Off, running, and fault. It sees a sample time, not a sensor `Reading` |
+| `domain` | `domain` | Sensor-node measurements, status, command checks, and boot health |
+| `application` | `application` | Sensor-node ports, workers, command ingress, quiesce, and telemetry JSON |
+| `node_drivers` | `drivers` | Synthetic input and simulated output for the sensor/actuator examples |
+| `wiring` | `wiring` | Adapts platform primitives to the sensor-node ports on device |
 | `main/` | `device` | Product selection, board settings, task budgets, and object wiring |
 
-For example, `drivers::Sht3xSensor` is declared in
-`components/drivers/include/drivers/sht3x.hpp`.
+`platform`, `configuration`, `networking`, `drivers`, and `timed_output` live in
+`components/` and do not include the sensor-node application. Inbound MQTT bytes
+stay opaque. `domain`, `application`,
+`node_drivers`, and `wiring` live in `applications/node/components/` and are
+added only by projects that use that execution model.
+`drivers::Sht3xSensor` is declared in `components/drivers/include/drivers/sht3x.hpp`.
 Header paths use `application/...`. Kconfig symbols retain `ESPKIT_` because
 they share a global configuration namespace; the stored NVS namespace remains
 `espkit` to preserve provisioned settings.
@@ -31,18 +38,24 @@ justify a new build boundary.
 ## Dependency direction
 
 ```text
-main (composition root)
-  ├── drivers ──────────┐
-  ├── platform ─────────┤
-  ├── networking ───────┤──> application ──> domain
-  │      └── configuration (independent settings adapter)
-  └── domain / application
+main (sensor-node composition)
+  ├── wiring ──────────────> platform
+  ├── node_drivers ────────> application ──> domain
+  ├── drivers (SHT3x)
+  ├── timed_output
+  └── networking ──────────> configuration
+
+minimal application
+  └── log
 ```
 
-Domain, application, and drivers contain no ESP-IDF/FreeRTOS headers. Domain
-has no dependency on application. Ports belong to the application that consumes
-them, not to the SDK implementation. Platform, networking, and configuration
-must not depend on each other except networking's explicit configuration dependency.
+Domain, application, node_drivers, and the SHT3x driver contain no
+ESP-IDF/FreeRTOS headers. Domain has no dependency on application. `platform`,
+`configuration`, `drivers`, and `timed_output` do not include `domain` or `application`.
+Networking depends on configuration. Inbound MQTT bytes are a raw payload
+hook. `application::decode_command_envelope` calls `CommandIngress` and lives
+with the node application, so networking does not. Wiring adapts platform
+primitives to application ports on device. It is not a generic HAL or event bus.
 Public dependencies use CMake `REQUIRES`; implementation-only ones use `PRIV_REQUIRES`.
 Run `python3 tools/check_architecture.py`; CI checks owned include and component edges.
 This is a lightweight boundary check, not a general C++ dependency analyzer.
@@ -55,8 +68,13 @@ This is a lightweight boundary check, not a general C++ dependency analyzer.
 | Composition root | `main/device.cpp` selects and owns concrete implementations |
 | Adapter | ESP-IDF I2C/clock and FreeRTOS implement portable application ports |
 | Strategy | Sensor/output ports allow synthetic and physical implementations |
-| State machine | `domain::TimedOutput` explicitly tracks off/running/fault |
+| State machine | `timed_output::TimedOutput` explicitly tracks off/running/fault |
+| Service lifecycle | Network phases and `NetworkState`; stop releases resources in reverse order |
 | Producer-consumer | Bounded latest-value queues connect workers |
+| Bounded FIFO with rejection | Command ingress returns a status instead of overwriting or blocking |
+| Separate stop mailbox | A full command FIFO cannot delay `CommandType::stop` |
+| Output quiesce | One local stop, then poll applied output before a disruptive restart |
+| In-memory schema migration | `migrate_settings` upgrades stored network fields without rewriting NVS |
 
 No DI container, service locator, Singleton, generic event bus, or factory hierarchy
 is required. A replaceable control-policy interface should wait until a second
@@ -67,50 +85,98 @@ one dynamically allocated object per state.
 
 `app_main()` calls `device::start_device()`. A function-local static `DeviceRuntime`
 constructs after SDK startup. Members are declared before objects borrowing them.
-The runtime is boot-lifetime and startup is one-shot. Individual service shutdown,
-restart, and resource recovery after partial SDK initialization are not supported.
-This constraint is explicit; these adapters are not general-purpose restartable services.
+The runtime object and the sensor, control, and reporter tasks are boot-lifetime.
+`start_device()` does not stop them. The network stack is different: it has an
+explicit lifecycle so a failed or partial SDK initialization can be released and
+retried, and so Wi-Fi can be stopped and started again, without rebooting and
+without stopping local control. See [ADR 0007](decisions/0007-service-lifecycle.md).
 
 Sensor (500 ms), control (100 ms), and reporter (2000 ms) workers run independently.
 Two length-one FreeRTOS queues carry latest-value snapshots; reads do not consume
-them. Overwrite is intentional. Commands need a separate bounded FIFO and rejection
-semantics. Startup seeds a reading and applies safe OFF before tasks start.
+them. Overwrite is intentional. Commands use a separate bounded FIFO that rejects
+when full, plus a one-slot stop notice. `CommandIngress::submit` is single-threaded.
+Reassemble a remote payload on that worker before `decode_command_envelope` calls
+`submit`. The FIFO and stop mailbox are the cross-task boundary. A full result
+FIFO rejects a new enable. The default firmware does not call `submit`, so the
+output request stays off. Startup seeds a reading and applies safe OFF before
+tasks start.
 
-Before any tasks start, the composition root loads validated settings through
-`configuration::NvsConfigStore` and passes a copy to `NetworkService::configure()`.
-Only the network task calls `NetworkService::step()`. It steps `WifiStation`, waits
-for injected `NetworkTime` readiness, then starts `MqttTelemetry`. The service
-uses portable connection ports; `SntpTime` owns the SDK time-sync calls.
-The reporter calls `NetworkService::report()`, which gates transmission on Wi-Fi
-state and delegates to MQTT. Wi-Fi and MQTT callbacks update atomic adapter state;
-retry timing and initialization state belong to the network worker. MQTT's callback
-also enqueues retained online availability. MQTT config references remain valid
-because `NetworkService` owns its settings for the boot lifetime.
+`DeviceRuntime` owns `WifiStation`, `SntpTime`, `MqttTelemetry`, and
+`NetworkService` for the boot. `stop` does not destroy those objects. Before any
+tasks start, the composition root loads validated settings through
+`configuration::NvsConfigStore` and passes a copy to `NetworkService::configure()`
+on the startup thread. That call is accepted from `disabled` and moves the
+service to `starting`. After the network task starts, that task is the only
+caller of `configure`, `start`, `stop`, `step`, and `state`. A later `configure`
+is accepted only from `stopped`: it replaces the owned copy, stays `stopped`
+until `start`, and does not write NVS. There is no second writer. Every other
+state ignores `configure`.
 
-Control never calls networking. Telemetry uses bounded nonblocking enqueue with
-QoS 0 and no offline backlog. Sensor bus waits remain on the sensor task. Task
-budgets require hardware measurement; compilation is not timing validation.
+`step` starts Wi-Fi, then SNTP when the URI is `mqtts://`, waits for the link and
+for injected `NetworkTime` readiness, then starts MQTT. `stop` releases in the
+opposite order: MQTT, SNTP, then Wi-Fi. A failed `start` releases the resources
+that stage owns. Wi-Fi bring-up failure releases the whole stack and moves to
+`failed`, which `step` retries after `network_init_retry_ms`. MQTT bring-up
+failure releases only the client and retries it, leaving the station and SNTP up.
+`waiting_for_time` is bounded on the monotonic clock. One SNTP session waits
+`network_init_retry_ms`; on expiry `step` stops SNTP and begins it again. After
+`network_time_session_budget` sessions the bring-up fails like a Wi-Fi `start`
+failure. `NetworkTime::ready()` stays a wall-clock check. A failed MQTT or SNTP
+release leaves that phase in place so the next `stop` or `start` can finish it.
+`stopped` does not retry until `start`. Losing the link after a successful start
+is not `failed`; the station and the MQTT client reconnect on their own.
+
+The TCP/IP stack and the default event loop stay initialized across that restart.
+ESP-IDF does not support `esp_netif_deinit`, and SNTP and MQTT share the event
+loop. The station netif, Wi-Fi driver, handlers, MQTT client, and SNTP session are
+the resources `stop` actually releases. `esp_netif_create_default_wifi_sta` aborts
+on failure, so the adapter uses the fallible netif calls instead; an abort would
+stop the control task as well.
+
+The reporter encodes `domain::Telemetry` with `application::encode_telemetry`
+and calls `NetworkService::forward()`. That call gates transmission on the
+Wi-Fi link and delegates the bytes to MQTT. It may run while the network task is
+stopping. The MQTT adapter serializes use of the client pointer. Wi-Fi and MQTT
+callbacks only update atomics. The network worker enqueues retained online
+availability after the callback records a connection. Config strings remain
+valid because `NetworkService` owns its settings for the boot lifetime.
+Replacing that copy is allowed only from `stopped`, after `stop` has released
+the MQTT client that borrowed the strings.
+
+`NetworkService::stop` does not read the sensor and does not change the output.
+`application::OutputQuiesce` submits one local stop and polls `applied_output`.
+Only a sample newer than that submit, reading `off`, is a confirmed safe output.
+`unknown`, a sample that is still `on`, and a deadline without that sample are
+unsuccessful. The helper does not call network `stop` or OTA, and boot does not
+call the helper. See [ADR 0008](decisions/0008-output-quiesce.md). Control never
+calls networking. Telemetry uses bounded nonblocking enqueue with QoS 0 and no
+offline backlog. Sensor bus waits remain on the sensor task. Task budgets require
+hardware measurement; compilation is not timing validation.
 
 ## Safety and status
 
 `TimedOutput` rejects invalid/stale input and maximum runtime expiry, latching a
 fault. Repeated ON requests cannot extend an interval. The worker applies the
 policy decision; output errors latch fault and trigger a best-effort OFF. Failed
-OFF is reported as unknown, not confirmed OFF. Applied status is software
-acknowledgement, not physical feedback. Cooldowns, duty limits, independent
-interlocks, and hardware watchdog behavior are product responsibilities.
+OFF is reported as unknown, not confirmed OFF. A latched stop is `applied` only
+when that step observed `off`. Applied status is software acknowledgement, not
+physical feedback. Cooldowns, duty limits, independent interlocks, and hardware
+watchdog behavior are product responsibilities. See
+[ADR 0008](decisions/0008-output-quiesce.md).
 
-Physical outputs and remote commands remain disabled. Log status identifies sensor
-origin separately from the simulated output mode. See [Safety](safety.md).
+Physical outputs remain disabled. Remote command sources stay rejected unless
+`ESPKIT_REMOTE_COMMANDS` is enabled, and that option does not subscribe to MQTT.
+Log status identifies sensor origin separately from the simulated output mode.
+See [Safety](safety.md) and [ADR 0005](decisions/0005-command-ingress.md).
 
 ## Constants and settings
 
-- `main/device_config.hpp`: sampling periods, task stacks/priorities, and selected policy.
+- `main/device_config.hpp`: sampling periods, task stacks/priorities, command queue depths, and selected policy.
 - `main/boards/esp32s3/board_config.hpp`: GPIO and bus settings, exposed by `main/Kconfig.projbuild`.
-- `domain/policy_defaults.hpp`: reusable safe-policy defaults, overridable through `OutputPolicy`.
+- `timed_output/timed_output.hpp`: reusable run-time and sample-age defaults, overridable through `OutputPolicy`.
 - `platform/constants.hpp`: queue capacity and time conversions, not deployment task budgets.
 - Driver `.cpp` files: fixed protocol commands, CRC values, and timing requirements.
-- Runtime NVS: validated network credentials and identity; see [Hardware and MQTT](hardware-mqtt.md).
+- Runtime NVS: validated network credentials and identity, schema 1, with in-memory migration; see [Hardware and MQTT](hardware-mqtt.md) and [ADR 0006](decisions/0006-versioned-settings.md).
 
 Use units in names. Configuration objects express values that vary by device;
 constants express fixed protocol/library rules. Do not collect every literal into

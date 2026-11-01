@@ -1,0 +1,31 @@
+dependencies:
+  configuration:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/configuration
+      type: local
+    version: 3.0.0
+  idf:
+    source:
+      type: idf
+    version: 5.4.2
+  networking:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    - name: configuration
+      path: ../configuration
+      version: 3.0.0
+    source:
+      path: ../../components/networking
+      type: local
+    version: 3.0.0
+direct_dependencies:
+- configuration
+- idf
+- networking
+manifest_hash: acf4bf10467f120f70f1a20dc824e1988f5c941f177abe9480d346d92eeed4e0
+target: esp32s3
+version: 2.0.0

@@ -4,9 +4,9 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "platform/clock.hpp"
 #include "platform/periodic_task.hpp"
-#include "platform/snapshot.hpp"
+#include "wiring/clock.hpp"
+#include "wiring/snapshot.hpp"
 
 #include <cstdlib>
 
@@ -19,13 +19,13 @@ constexpr unsigned reporting_period_ms = 1000;
 } // namespace
 
 extern "C" void app_main() {
-    static platform::EspClock clock;
+    static wiring::Clock clock;
     static drivers::SyntheticSensor sensor(demo_sensor_value);
-    static platform::FreeRtosSnapshot<domain::Reading> readings;
+    static wiring::Snapshot<domain::Reading> readings;
     static application::SensorWorker worker(sensor, clock, readings);
-    static platform::PeriodicTask task(worker,
-                                       {"sensor", device::defaults::sensor_stack_bytes,
-                                        device::defaults::sensor_priority, sampling_period_ms});
+    static platform::PeriodicTask<application::SensorWorker> task(
+        worker, {"sensor", device::defaults::sensor_stack_bytes, device::defaults::sensor_priority,
+                 sampling_period_ms});
     if (!readings.ready()) {
         std::abort();
     }

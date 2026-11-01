@@ -1,3 +1,20 @@
+choice ESPKIT_APPLICATION_PROFILE
+    prompt "Application profile"
+    default ESPKIT_PROFILE_SENSOR
+    help
+        Selects which application sources the root project compiles.
+        Pass -DESPKIT_PROFILE=minimal, sensor, or actuator to idf.py.
+        This is not the chip target and not a board pin profile.
+        Delete sdkconfig before switching profiles.
+
+    config ESPKIT_PROFILE_MINIMAL
+        bool "Minimal application"
+    config ESPKIT_PROFILE_SENSOR
+        bool "Sensor node composition"
+    config ESPKIT_PROFILE_ACTUATOR
+        bool "Actuator node"
+endchoice
+
 menu "ESPKit board and sensor"
 config ESPKIT_SENSOR_SHT3X
     bool "Use a physical SHT3x-DIS sensor instead of synthetic input"
@@ -21,4 +38,15 @@ config ESPKIT_SHT3X_ADDRESS
     range 0x44 0x45
     default 0x44
     depends on ESPKIT_SENSOR_SHT3X
+endmenu
+
+menu "ESPKit commands"
+config ESPKIT_REMOTE_COMMANDS
+    bool "Allow remote-sourced commands at the local ingress"
+    default n
+    help
+        Disabled by default. This permits CommandSource::remote to pass
+        local admission. It does not subscribe to MQTT, trust the network,
+        or drive a physical output. Accepted commands still pass through
+        the local TimedOutput policy.
 endmenu

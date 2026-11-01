@@ -18,6 +18,9 @@ idf.py -C examples/actuator-node build
 idf.py -C examples/actuator-node -p /dev/ttyACM0 flash monitor
 ```
 
+The application source is `profiles/actuator/app_main.cpp`, shared with the root
+`actuator` build profile.
+
 ## Expected output
 
 Illustrative log fields; timestamps and prefixes vary:

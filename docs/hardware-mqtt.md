@@ -13,8 +13,12 @@ Wi-Fi/broker execution still require the hardware acceptance checks below.
 - Runtime credentials loaded from a versioned `espkit` NVS namespace.
 
 The default firmware still uses synthetic input, simulated output, and no network.
-No GPIO actuator, MQTT command execution, irrigation automation, or OTA download is
-implemented. The SHT3x measures air temperature/humidity, not soil moisture.
+No GPIO actuator, MQTT command subscription, irrigation automation, or OTA download
+is implemented. A schema 1 decoder can map one reassembled payload onto the
+command ingress. The default firmware does not call it. Remote commands stay
+rejected unless `ESPKIT_REMOTE_COMMANDS` is enabled, and that option does not
+open a broker connection. The SHT3x measures air temperature/humidity, not soil
+moisture.
 
 ## Build a hardware-enabled configuration
 
@@ -73,7 +77,21 @@ idf.py -B build-hardware -p /dev/ttyACM0 flash monitor
 
 Do not use this offset on a different partition layout. Existing NVS settings are
 replaced, not merged. The application never automatically erases NVS to recover
-from an initialization failure. Configuration schema is 1; migrations are not implemented.
+from an initialization failure, and loading settings does not rewrite the namespace.
+
+The durable layout is schema 1 in the `espkit` namespace: `schema` as a `u8`,
+required strings `wifi_ssid`, `wifi_pass`, `mqtt_uri`, `device_id`, and `site_id`,
+plus optional `mqtt_user` and `mqtt_pass`. A record with no `schema` key is the
+unversioned layout. This firmware keeps it when those schema 1 fields validate,
+and applies that upgrade only in memory. A schema newer than this firmware is
+used only when the same fields still validate. Unknown keys are left untouched.
+Corrupt, partial, and out-of-range records are ignored, so networking stays off
+and local control continues. Values are not shortened to force them in range.
+See [ADR 0006](decisions/0006-versioned-settings.md). On rejection the firmware
+logs `rejected NVS settings problem=<n> schema=<version>` (`1` corrupt, `2`
+partial, `3` out of range, `4` incompatible). An in-memory upgrade or a newer
+schema logs `loaded NVS settings outcome=<n> schema=<version>` (`1` migrated,
+`2` compatible with a newer schema). The log does not include stored values.
 
 ## Network behavior
 
@@ -96,6 +114,16 @@ Telemetry uses `iot/v1/{site_id}/{device_id}/telemetry`, QoS 0, no offline backl
 and no retain. Availability uses a retained online message and an offline last will.
 MQTT's reconnect interval has per-device startup jitter; Wi-Fi uses exponential
 backoff with jitter. MQTT outbox storage is limited to 4096 bytes.
+
+A failed station or MQTT `start` releases the resources that attempt acquired and
+retries without rebooting. A wall clock that never becomes valid for TLS does
+the same after a bounded SNTP wait: the session is stopped and begun again, then
+the stack is released. A release the SDK does not finish stays recorded so the
+next stop can retry it. Stopping the network does not stop sensor or control
+tasks and does not change the output. The TCP/IP stack and the default event loop
+stay initialized across that restart. See
+[ADR 0007](decisions/0007-service-lifecycle.md). Hardware was not used to confirm
+the cleanup.
 
 Only the reporter calls the MQTT sink. Network initialization/retries run in a
 separate task. While offline, reports are dropped and counted; control and sensor

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "application/ports/device.hpp"
+#include <cstdint>
 
 namespace platform {
 
-class EspClock final : public application::Clock {
+class EspClock {
     public:
-    domain::Milliseconds now() const noexcept override;
+    std::int64_t now() const noexcept;
 };
 
 } // namespace platform

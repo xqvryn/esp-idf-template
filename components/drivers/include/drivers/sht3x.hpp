@@ -1,8 +1,6 @@
 #pragma once
 
-#include "application/ports/device.hpp"
-#include "application/ports/io.hpp"
-
+#include <cstdint>
 #include <span>
 
 namespace drivers {
@@ -13,19 +11,33 @@ struct EnvironmentSample {
     bool valid{false};
 };
 
+// Bus contract for this driver. Not a board HAL.
+class I2cBus {
+    public:
+    virtual ~I2cBus() = default;
+    virtual bool write(std::span<const std::uint8_t> bytes) noexcept = 0;
+    virtual bool read(std::span<std::uint8_t> bytes) noexcept = 0;
+};
+
+class Delay {
+    public:
+    virtual ~Delay() = default;
+    virtual void sleep_for(std::int64_t duration_ms) noexcept = 0;
+};
+
 // SHT30/31/35-DIS single-shot, high repeatability, no clock stretching.
 EnvironmentSample decode_sht3x(std::span<const std::uint8_t> frame) noexcept;
 
-class Sht3xSensor final : public application::SensorSource {
+class Sht3xSensor {
     public:
-    Sht3xSensor(application::I2cDevice& bus, application::Delay& delay) : bus_(bus), delay_(delay) {
+    Sht3xSensor(I2cBus& bus, Delay& delay) : bus_(bus), delay_(delay) {
     }
 
-    domain::Reading read(domain::Milliseconds now) noexcept override;
+    EnvironmentSample measure() noexcept;
 
     private:
-    application::I2cDevice& bus_;
-    application::Delay& delay_;
+    I2cBus& bus_;
+    Delay& delay_;
 };
 
 } // namespace drivers

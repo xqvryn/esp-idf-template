@@ -33,7 +33,8 @@ records dependency resolution, and `release.config.mjs` owns source release poli
 `package.json` is Node-based release tooling only; nothing is published to npm.
 
 The template source and the sample firmware in a release use the same computed
-version. A project created with Use this template starts its own Git history and
+version. Component manifests in `idf_component.yml` use that same stable number
+once it is chosen; see `CHANGELOG.md`. A project created with Use this template starts its own Git history and
 product versioning policy; it does not inherit upstream release tags automatically.
 A new repository's first automatic release normally starts at 1.0.0.
 

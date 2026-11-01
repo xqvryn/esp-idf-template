@@ -1,0 +1,6 @@
+version: "3.0.0"
+description: "Validated network settings, schema migration, and NVS storage"
+url: "https://github.com/xqvryn/esp-idf-template"
+license: "MIT"
+dependencies:
+  idf: ">=5.4"

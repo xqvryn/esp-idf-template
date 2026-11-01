@@ -32,7 +32,7 @@ def main() -> int:
         parser.error(f'clang-format 18 is required; found {version.strip()}')
 
     changed = []
-    for directory in ('components', 'main', 'tests', 'examples'):
+    for directory in ('components', 'applications', 'main', 'profiles', 'tests', 'examples'):
         for path in sorted((ROOT / directory).rglob('*')):
             if path.suffix not in ('.hpp', '.cpp', '.h', '.c'):
                 continue

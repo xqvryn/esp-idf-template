@@ -8,11 +8,32 @@ non-extending requests, sensor validity/freshness, clock regression, invalid pol
 and fault reset. Worker tests inject alternate sensors, a fake clock, in-memory
 snapshots, request sources, and failed outputs. They verify missing/stale input,
 fault propagation, failed-stop unknown state, and reporting without ESP-IDF.
+Command tests cover a full queue, invalid and expired commands, duplicates,
+stale sequences, remote rejection, stop while the FIFO is full, and commands
+that cannot override a `TimedOutput` fault. A stop is `applied` only when the
+control step observed `off`. Quiesce tests submit one local stop and poll
+applied output. They confirm only a newer `off` sample. `unknown`, a sample
+that is still `on`, a deadline, a rejected stop, and an overwritten stop's bare
+`accepted` result are not safe. The helper does not call network `stop` or OTA.
+Envelope tests cover schema 1 decoding, wall-clock conversion, oversize and
+malformed payloads, unknown versions, expiry before `submit`, and a full result
+FIFO rejecting a new enable.
+Settings tests cover unversioned upgrade, schema 1, a newer schema, corrupt and
+partial records, out-of-range values, and empty optional credentials. They call
+`migrate_settings` directly and do not open NVS.
+Network lifecycle tests cover start order, reverse-order stop, a repeated stop,
+Wi-Fi and MQTT init failure, retry after the monotonic delay, a stalled SNTP
+wait (separate from the wall-clock `ready()` rule), and control continuing
+while the network is stopped. Resource-phase transitions, including a failed
+MQTT or SNTP release, are tested without ESP-IDF. The Unity application does not run those cases: SDK teardown
+needs a board, and the host tests already cover the portable contract.
+Boot-health tests hold, confirm, or refuse from a completed control step and the
+applied output. Both broker flags are compared and produce the same decision.
 Add domain-specific boundary tests when control rules grow.
 
 ## Target
 
-A Unity policy smoke test lives in `components/domain/test/`, with a dedicated
+A Unity policy smoke test lives in `applications/node/components/domain/test/`, with a dedicated
 application in `tests/target/`. Build and flash it using:
 
 ```sh
@@ -32,7 +53,7 @@ For the optional networking path, run a local test broker and inject disconnects
 credentials, duplicate and expired commands, fragmented payloads, queue pressure,
 and simultaneous reconnects. Observe control deadlines while the network is busy.
 
-CI compiles default and hardware-enabled root firmware, the Unity application, and all three examples. It runs
+CI compiles default and hardware-enabled root firmware, the Unity application, and every example, including `examples/minimal`. It runs
 host tests, firmware bundle integrity tests, release-rule checks, formatting, and
 strict documentation builds. `python3 tools/check_architecture.py` checks owned
 include and CMake dependency boundaries. It does not claim on-device validation.

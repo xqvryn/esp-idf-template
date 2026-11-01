@@ -1,0 +1,2 @@
+# Application profile. Chip target and board defaults are separate files.
+CONFIG_ESPKIT_PROFILE_MINIMAL=y
