@@ -83,7 +83,7 @@ Breaking source adjustments inside this repository:
 
 - Component manifests live next to `platform`, `configuration`, `networking`,
   and `drivers`. Examples consume them with path dependencies. They are not
-  uploaded to the component registry. See [Use ESPKit](../using-espkit.md).
+  uploaded to the component registry. See [Use the components](../guides/components.md).
 - `TimedOutput` is `components/timed_output` and does not include `Reading`.
   The control worker turns a non-finite measurement into an invalid sample time.
 - `LogTelemetry` stays in node wiring. It prints sensor status. General logging

@@ -69,10 +69,11 @@ bash tools/test-host.sh
 | `components/configuration/` | Optional validated NVS settings |
 | `components/networking/` | Optional Wi-Fi, SNTP, and MQTT lifecycle |
 | `components/drivers/` | Optional SHT3x driver |
+| `components/timed_output/` | Optional timed-output policy, independent of sensor readings |
 | `applications/node/` | Sensor/actuator domain, workers, simulated drivers, and device wiring |
 | `tests/host/` | GoogleTest tests built without ESP-IDF |
 | `docs/` | Architecture, protocols, safety, and roadmap |
-| `examples/` | Minimal, simulation, sensor-node, and actuator-node projects |
+| `examples/` | Minimal, networking, simulation, sensor-node, and actuator-node projects |
 | `.github/workflows/` | Tests, example builds, docs, and opt-in deployment/release |
 
 See [Hardware and MQTT](docs/hardware-mqtt.md) for optional real sensor/network setup,
@@ -84,7 +85,7 @@ and [Roadmap](docs/roadmap.md).
 
 ## Documentation and examples
 
-Read [Getting Started](docs/getting-started/installation.md), [Examples](docs/examples.md),
+Read [Getting Started](docs/getting-started/index.md), [Examples](docs/examples.md),
 and [Releases and Branches](docs/releases.md). Preview the English site locally:
 
 ```sh
@@ -114,7 +115,7 @@ repository. Depend on individual components when an existing project should pin
 the same networking, storage, or driver sources. The template copy does not
 receive later upstream commits. The component manifests are ready to publish
 and are not uploaded to the component registry. See
-[Use ESPKit](docs/using-espkit.md).
+[Use the components](docs/guides/components.md).
 
 ## Customize
 
