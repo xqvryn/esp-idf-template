@@ -1,6 +1,7 @@
 #pragma once
 
 #include "configuration/network_config.hpp"
+#include "networking/payload.hpp"
 
 #include <span>
 
@@ -34,6 +35,8 @@ class MqttConnection {
     virtual void publish_availability() noexcept = 0;
     // false when the payload was not queued. Empty payloads are dropped.
     virtual bool publish(std::span<const char> payload) noexcept = 0;
+    // Replaces any previous handler. nullptr clears it. The MQTT task calls it.
+    virtual void set_payload_handler(MqttPayloadHandler* handler) noexcept = 0;
 };
 
 class NetworkTime {

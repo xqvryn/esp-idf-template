@@ -134,6 +134,9 @@ jobs:
             project: examples/actuator-node
           - name: minimal
             project: examples/minimal
+          - name: networking-only
+            project: examples/networking
+            check: no-node
           - name: profile-minimal
             project: .
             profile: minimal
@@ -154,6 +157,7 @@ jobs:
           SOURCE_SHA: ${{ github.sha }}
           CONFIG_DEFAULTS: ${{ matrix.defaults }}
           ESPKIT_PROFILE: ${{ matrix.profile }}
+          BUILD_CHECK: ${{ matrix.check }}
           FIRMWARE_VERSION: ${{ needs.version.outputs.version }}
         run: |
           . "$IDF_PATH/export.sh"
@@ -166,6 +170,12 @@ jobs:
           fi
           idf.py -C "$PROJECT_DIR" "${profile_args[@]}" set-target esp32s3
           idf.py -C "$PROJECT_DIR" "${profile_args[@]}" -DPROJECT_VER="$FIRMWARE_VERSION" build
+          if [ "${BUILD_CHECK:-}" = "no-node" ]; then
+            if grep -E -q 'libapplication\.a|libdomain\.a|applications/node' "$PROJECT_DIR/build/build.ninja"; then
+              echo "networking-only build pulled in the node application" >&2
+              exit 1
+            fi
+          fi
           idf.py -C "$PROJECT_DIR" size
           python tools/package_firmware.py \
             --build-dir "$PROJECT_DIR/build" \

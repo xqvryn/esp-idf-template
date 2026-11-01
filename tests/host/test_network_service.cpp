@@ -92,6 +92,9 @@ class FakeMqtt final : public networking::MqttConnection {
         ++availability_publishes;
     }
 
+    void set_payload_handler(networking::MqttPayloadHandler*) noexcept override {
+    }
+
     std::vector<std::string>* trace{nullptr};
     int starts{0};
     int stops{0};
