@@ -79,8 +79,8 @@ exists.
 ## Versions
 
 Firmware versions are calculated by semantic-release. See
-[Releases](releases.md). The `version` field in each component manifest is the
-component version a registry upload would use. It is `0.1.0` until a maintainer
-publishes. Bump that field when the component's public API changes, and tag the
-repository before asking other projects to pin it. A git dependency on `main`
-tracks the integration branch and is not a release.
+[Releases](releases.md) and the root `CHANGELOG.md`. The `version` field in
+each component manifest matches the pending stable release, currently `3.0.0`.
+Nothing has been uploaded to the component registry or tagged by this change.
+Pin an external git dependency to `v3.0.0` only after that tag exists. A git
+dependency on `main` tracks the integration branch and is not a release.
