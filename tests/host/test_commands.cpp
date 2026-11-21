@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <gtest/gtest.h>
+#include <limits>
 #include <vector>
 
 namespace {
@@ -534,4 +535,36 @@ TEST(CommandRequests, StopLeftOnIsNotApplied) {
     const auto records = drain_results(path.results);
     ASSERT_EQ(records.size(), 2U);
     EXPECT_EQ(records[1].status, domain::CommandStatus::not_applied);
+}
+
+TEST(CommandRequests, ShorterLeaseNearInt64MaxDoesNotOverflow) {
+    constexpr domain::CommandLimits limits{5000, 15000};
+    MemoryFifo<application::QueuedCommand, 4> commands;
+    MemoryFifo<domain::CommandResult, 8> results;
+    MemorySnapshot<application::StopNotice> stops;
+    application::CommandIngress ingress(commands, results, stops, limits, false);
+    application::CommandRequests requests(commands, results, stops, limits.max_run_ms);
+
+    // now + 1000 does not fit in int64. The shorter follow-up still does, as a span
+    // from the lease start, and must end the request at 500 ms without wrapping.
+    constexpr auto now = std::numeric_limits<domain::Milliseconds>::max() - 600;
+    domain::Command longer{};
+    longer.id = 1;
+    longer.sequence = 1;
+    longer.identity = 7;
+    longer.type = domain::CommandType::set_output;
+    longer.source = domain::CommandSource::local;
+    longer.enabled = true;
+    longer.expires_at = now + 600;
+    longer.max_duration_ms = 1000;
+    domain::Command shorter = longer;
+    shorter.id = 2;
+    shorter.sequence = 2;
+    shorter.max_duration_ms = 500;
+
+    EXPECT_EQ(ingress.submit(longer, now), domain::CommandStatus::accepted);
+    EXPECT_EQ(ingress.submit(shorter, now), domain::CommandStatus::accepted);
+    EXPECT_TRUE(requests.enable_requested(now));
+    EXPECT_TRUE(requests.enable_requested(now + 499));
+    EXPECT_FALSE(requests.enable_requested(now + 500));
 }
