@@ -18,10 +18,10 @@ set(ENV{ESPKIT_PROFILE} "${ESPKIT_PROFILE}")
 # profile does not call so they are not compiled. Node components are not in that
 # directory; they are added only for the sensor and actuator profiles.
 if(ESPKIT_PROFILE STREQUAL "minimal")
-    set(EXCLUDE_COMPONENTS platform configuration networking drivers)
+    set(EXCLUDE_COMPONENTS platform configuration networking drivers runtime parameters channels runtime_task)
 elseif(ESPKIT_PROFILE STREQUAL "actuator")
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/applications/node/components")
-    set(EXCLUDE_COMPONENTS configuration networking drivers)
+    set(EXCLUDE_COMPONENTS configuration networking drivers runtime parameters channels runtime_task)
 else()
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/applications/node/components")
 endif()

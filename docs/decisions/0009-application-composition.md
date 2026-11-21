@@ -40,6 +40,10 @@ Classification of the code that exists today:
 | Storage (validated settings and NVS) | Optional component `components/configuration` |
 | Sensor driver, for example SHT3x | Optional component `components/drivers`. It returns its own sample type |
 | Output policy `TimedOutput` | Reusable component `components/timed_output`. It sees a sample time, not a sensor `Reading` |
+| Task spec, service start/stop/health, loop budget, SPSC queue, latest-value mailbox | Optional component `components/runtime`. No task is created here |
+| Pinned periodic FreeRTOS task | Optional component `components/runtime_task`. It calls one `step()` |
+| Typed parameter table and NVS blob | Optional component `components/parameters`. A command handler calls `write_text`; the sensor envelope is unchanged |
+| Structured record channel and latest telemetry sample | Optional component `components/channels` |
 | Irrigation policy | Smart-farm application only. Not in this template |
 | Application workers, command ingress, quiesce, telemetry JSON, command envelope | Sensor/actuator application under `applications/node/` |
 | Synthetic sensor and simulated output | That same application (`node_drivers`), not the reusable driver |
@@ -90,3 +94,7 @@ Breaking source adjustments inside this repository:
   remains `ESP_LOG`.
 - Application profiles are selected with `-DESPKIT_PROFILE=minimal|sensor|actuator`.
   They stay orthogonal to chip target and board profile. See `profiles/README.md`.
+- `runtime`, `parameters`, `channels`, and `runtime_task` are optional. The minimal
+  and actuator profiles exclude them. `examples/minimal` does not depend on them.
+  They are not a service locator, event bus, or board HAL. A scripted service,
+  clock, or memory parameter store is a test double for the type it stands in for.

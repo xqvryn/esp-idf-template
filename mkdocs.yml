@@ -105,6 +105,10 @@ nav:
       - Networking: components/networking.md
       - Drivers: components/drivers.md
       - Timed output: components/timed-output.md
+      - Runtime: components/runtime.md
+      - Parameters: components/parameters.md
+      - Channels: components/channels.md
+      - Runtime task: components/runtime-task.md
   - Examples:
       - Overview: examples.md
       - Minimal: examples/minimal.md

@@ -21,6 +21,10 @@ Each reusable component has an `idf_component.yml` with version `3.0.0`, a descr
 | `networking` | `components/networking/idf_component.yml` | `configuration` |
 | `drivers` | `components/drivers/idf_component.yml` | ESP-IDF |
 | `timed_output` | `components/timed_output/idf_component.yml` | ESP-IDF |
+| `runtime` | `components/runtime/idf_component.yml` | ESP-IDF |
+| `parameters` | `components/parameters/idf_component.yml` | ESP-IDF |
+| `channels` | `components/channels/idf_component.yml` | `runtime` |
+| `runtime_task` | `components/runtime_task/idf_component.yml` | `runtime` |
 
 Add the components you call to `main/idf_component.yml`:
 
@@ -51,6 +55,6 @@ dependencies:
 
 `override_path` is the other local form. It replaces a versioned dependency with a directory while you edit. `path` is enough while the component is not in the registry.
 
-`platform`, `configuration`, `networking`, `drivers`, and `timed_output` do not compile the sensor workers. `examples/networking` is the build that checks that. Leave `applications/node` off the path unless you want those workers.
+`platform`, `configuration`, `networking`, `drivers`, `timed_output`, `runtime`, `parameters`, `channels`, and `runtime_task` do not compile the sensor workers. `examples/networking` is the build that checks the network side of that split. Leave `applications/node` off the path unless you want those workers. The minimal profile does not compile the runtime, parameter, or channel components.
 
 A node that accepts MQTT commands installs `networking::MqttPayloadHandler` and calls `application::decode_command_envelope` itself. Networking does not decode commands.

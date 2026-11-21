@@ -1,0 +1,9 @@
+version: "3.0.0"
+description: "Bounded structured log records and a latest telemetry sample"
+url: "https://github.com/xqvryn/esp-idf-template"
+license: "MIT"
+dependencies:
+  idf: ">=5.4"
+  runtime:
+    path: "../runtime"
+    version: "3.0.0"

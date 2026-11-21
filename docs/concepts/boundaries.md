@@ -9,6 +9,10 @@ This is the accepted split from [ADR 0009](../decisions/0009-application-composi
 | Storage (validated settings and NVS) | Optional `components/configuration` |
 | Sensor driver, for example SHT3x | Optional `components/drivers`. It returns its own sample type |
 | Output policy `TimedOutput` | Reusable `components/timed_output`. It sees a sample time, not a sensor `Reading` |
+| Task spec, loop budget, SPSC queue, latest mailbox | Optional `components/runtime` |
+| Pinned periodic task | Optional `components/runtime_task` |
+| Parameter registry and its NVS blob | Optional `components/parameters` |
+| Structured records and latest telemetry | Optional `components/channels` |
 | Irrigation policy | A smart-farm application only. Not in this template |
 | Application workers, command ingress, quiesce, telemetry JSON, command envelope | `applications/node/` |
 | Synthetic sensor and simulated output | That same application (`node_drivers`), not the reusable driver |

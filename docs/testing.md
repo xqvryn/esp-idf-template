@@ -30,6 +30,11 @@ needs a board, and the host tests already cover the portable contract.
 Boot-health tests hold, confirm, or refuse from a completed control step and the
 applied output. Both broker flags are compared and produce the same decision.
 Add domain-specific boundary tests when control rules grow.
+Runtime tests cover task-spec rejection, a scripted service, loop-budget jitter
+and skipped deadlines, a full SPSC queue, and a latest-value mailbox. Parameter
+tests cover range checks, `write_text` assignment, and a memory-store round trip.
+Channel tests cover a dropped record and a replaced telemetry sample. Those
+tests do not open NVS or start FreeRTOS.
 
 ## QEMU
 
