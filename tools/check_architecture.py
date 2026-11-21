@@ -12,6 +12,13 @@ COMPONENTS = {
     'networking': ROOT / 'components' / 'networking',
     'drivers': ROOT / 'components' / 'drivers',
     'timed_output': ROOT / 'components' / 'timed_output',
+    'runtime': ROOT / 'components' / 'runtime',
+    'parameters': ROOT / 'components' / 'parameters',
+    'channels': ROOT / 'components' / 'channels',
+    'runtime_task': ROOT / 'components' / 'runtime_task',
+    'motion': ROOT / 'components' / 'motion',
+    'motion_port': ROOT / 'components' / 'motion_port',
+    'flight': ROOT / 'components' / 'flight',
     'domain': ROOT / 'applications' / 'node' / 'components' / 'domain',
     'application': ROOT / 'applications' / 'node' / 'components' / 'application',
     'node_drivers': ROOT / 'applications' / 'node' / 'components' / 'node_drivers',
@@ -23,12 +30,29 @@ ALLOWED = {
     'networking': {'configuration'},
     'drivers': set(),
     'timed_output': set(),
+    'runtime': set(),
+    'parameters': set(),
+    'channels': {'runtime'},
+    'runtime_task': {'runtime'},
+    'motion': set(),
+    'motion_port': {'motion'},
+    'flight': {'motion', 'parameters'},
     'domain': set(),
     'application': {'domain', 'timed_output'},
     'node_drivers': {'domain', 'application'},
     'wiring': {'domain', 'application', 'platform', 'drivers', 'node_drivers'},
 }
-PORTABLE = {'drivers', 'domain', 'application', 'node_drivers', 'timed_output'}
+PORTABLE = {
+    'drivers',
+    'domain',
+    'application',
+    'node_drivers',
+    'timed_output',
+    'runtime',
+    'channels',
+    'motion',
+    'flight',
+}
 
 
 def main() -> int:

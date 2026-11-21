@@ -3,7 +3,7 @@ choice ESPKIT_APPLICATION_PROFILE
     default ESPKIT_PROFILE_SENSOR
     help
         Selects which application sources the root project compiles.
-        Pass -DESPKIT_PROFILE=minimal, sensor, or actuator to idf.py.
+        Pass -DESPKIT_PROFILE=minimal, sensor, actuator, or drone to idf.py.
         This is not the chip target and not a board pin profile.
         Delete sdkconfig before switching profiles.
 
@@ -13,6 +13,8 @@ choice ESPKIT_APPLICATION_PROFILE
         bool "Sensor node composition"
     config ESPKIT_PROFILE_ACTUATOR
         bool "Actuator node"
+    config ESPKIT_PROFILE_DRONE
+        bool "Drone skeleton (simulation only)"
 endchoice
 
 menu "ESPKit board and sensor"
@@ -49,4 +51,16 @@ config ESPKIT_REMOTE_COMMANDS
         local admission. It does not subscribe to MQTT, trust the network,
         or drive a physical output. Accepted commands still pass through
         the local TimedOutput policy.
+endmenu
+
+menu "ESPKit QEMU harness"
+config ESPKIT_QEMU_HARNESS
+    bool "Serial harness for scripted QEMU tests"
+    default n
+    depends on ESPKIT_PROFILE_SENSOR
+    help
+        Reads "espkit ..." lines from the console UART and drives the
+        sensor, command ingress, and NVS store. Leave this off for
+        production firmware. tests/qemu enables it with
+        sdkconfig.defaults.qemu.
 endmenu

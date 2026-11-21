@@ -1,0 +1,12 @@
+version: "3.0.0"
+description: "Simulation-only quadcopter attitude, mixer, and arming skeleton"
+url: "https://github.com/xqvryn/esp-idf-template"
+license: "MIT"
+dependencies:
+  idf: ">=5.4"
+  motion:
+    path: "../motion"
+    version: "3.0.0"
+  parameters:
+    path: "../parameters"
+    version: "3.0.0"

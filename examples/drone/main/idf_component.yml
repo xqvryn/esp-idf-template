@@ -1,0 +1,10 @@
+dependencies:
+  idf: "==5.4.2"
+  flight:
+    path: "../../../components/flight"
+  motion:
+    path: "../../../components/motion"
+  parameters:
+    path: "../../../components/parameters"
+  channels:
+    path: "../../../components/channels"

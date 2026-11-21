@@ -29,7 +29,7 @@ flowchart TB
 ```
 
 - **Project template.** Root `CMakeLists.txt`, `.github/workflows/`, host tests, and these docs. Copy them with the GitHub template.
-- **Reusable components.** `platform`, `configuration`, `networking`, `drivers`, and `timed_output`. Each one builds without the sensor-node workers.
+- **Reusable components.** `platform`, `configuration`, `networking`, `drivers`, `timed_output`, and the optional `runtime`, `parameters`, `channels`, and `runtime_task` composition pieces. Each one builds without the sensor-node workers. The minimal profile does not compile the composition pieces.
 - **Examples.** `minimal`, `networking`, `sensor-node`, `actuator-node`, and `simulation`. They show different programs on the same CI.
 
 There is no shared event bus and no board HAL. A sensor-node worker receives the objects it needs in its constructor. `wiring` adapts ESP-IDF clocks, queues, and tasks to those workers. Networking publishes opaque bytes. The node encodes telemetry and, if you add a subscription later, decodes command payloads itself.

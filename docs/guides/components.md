@@ -21,6 +21,13 @@ Each reusable component has an `idf_component.yml` with version `3.0.0`, a descr
 | `networking` | `components/networking/idf_component.yml` | `configuration` |
 | `drivers` | `components/drivers/idf_component.yml` | ESP-IDF |
 | `timed_output` | `components/timed_output/idf_component.yml` | ESP-IDF |
+| `runtime` | `components/runtime/idf_component.yml` | ESP-IDF |
+| `parameters` | `components/parameters/idf_component.yml` | ESP-IDF |
+| `channels` | `components/channels/idf_component.yml` | `runtime` |
+| `runtime_task` | `components/runtime_task/idf_component.yml` | `runtime` |
+| `motion` | `components/motion/idf_component.yml` | ESP-IDF |
+| `motion_port` | `components/motion_port/idf_component.yml` | `motion` |
+| `flight` | `components/flight/idf_component.yml` | `motion`, `parameters` |
 
 Add the components you call to `main/idf_component.yml`:
 
@@ -30,14 +37,14 @@ dependencies:
   configuration:
     git: https://github.com/xqvryn/esp-idf-template.git
     path: components/configuration
-    version: main
+    version: v3.0.0
   networking:
     git: https://github.com/xqvryn/esp-idf-template.git
     path: components/networking
-    version: main
+    version: v3.0.0
 ```
 
-Replace `version: main` with a tag after `v3.0.0` exists. `git`, `path`, and `version` select one directory inside the repository. Then `REQUIRES` or `PRIV_REQUIRES` that component from CMake.
+`version: v3.0.0` selects that tag. The repository is public, so this `git` dependency works without a token. `git`, `path`, and `version` select one directory inside the repository. Then `REQUIRES` or `PRIV_REQUIRES` that component from CMake.
 
 These manifests are **not** uploaded to the ESP Component Registry. Do not add a registry dependency until a maintainer publishes them.
 
@@ -51,6 +58,6 @@ dependencies:
 
 `override_path` is the other local form. It replaces a versioned dependency with a directory while you edit. `path` is enough while the component is not in the registry.
 
-`platform`, `configuration`, `networking`, `drivers`, and `timed_output` do not compile the sensor workers. `examples/networking` is the build that checks that. Leave `applications/node` off the path unless you want those workers.
+`platform`, `configuration`, `networking`, `drivers`, `timed_output`, `runtime`, `parameters`, `channels`, and `runtime_task` do not compile the sensor workers. `examples/networking` is the build that checks the network side of that split. Leave `applications/node` off the path unless you want those workers. The minimal profile does not compile the runtime, parameter, or channel components.
 
 A node that accepts MQTT commands installs `networking::MqttPayloadHandler` and calls `application::decode_command_envelope` itself. Networking does not decode commands.

@@ -89,9 +89,11 @@ nav:
       - Cluster and swarm: distributed-systems.md
   - Guides:
       - Build profiles: guides/profiles.md
+      - Building a drone: guides/building-a-drone.md
       - Use the components: guides/components.md
       - Board porting: board-porting.md
       - Testing: testing.md
+      - Testing with QEMU: guides/qemu.md
       - CI and releases: guides/releases.md
       - Release details: releases.md
       - Repository setup: repository-setup.md
@@ -104,6 +106,13 @@ nav:
       - Networking: components/networking.md
       - Drivers: components/drivers.md
       - Timed output: components/timed-output.md
+      - Runtime: components/runtime.md
+      - Parameters: components/parameters.md
+      - Channels: components/channels.md
+      - Runtime task: components/runtime-task.md
+      - Motion: components/motion.md
+      - Motion port: components/motion-port.md
+      - Flight: components/flight.md
   - Examples:
       - Overview: examples.md
       - Minimal: examples/minimal.md

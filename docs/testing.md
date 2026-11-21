@@ -30,6 +30,19 @@ needs a board, and the host tests already cover the portable contract.
 Boot-health tests hold, confirm, or refuse from a completed control step and the
 applied output. Both broker flags are compared and produce the same decision.
 Add domain-specific boundary tests when control rules grow.
+Runtime tests cover task-spec rejection, a scripted service, loop-budget jitter
+and skipped deadlines, a full SPSC queue, and a latest-value mailbox. Parameter
+tests cover range checks, `write_text` assignment, and a memory-store round trip.
+Channel tests cover a dropped record and a replaced telemetry sample.
+Motion tests cover MPU-6050 and ICM-42688 scale conversion, a scripted I2C burst,
+pulse clamping, a DShot frame, SBUS failsafe, and PPM sync. Flight tests arm a
+quad only with low throttle, return a tilted rigid body toward level, track a
+stick step, and force zero motors on RC loss, low battery, and the kill switch.
+Those tests do not open NVS, start FreeRTOS, or program a GPIO.
+
+## QEMU
+
+`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, and `examples/simulation`. `python3 tests/qemu/run.py` drives commands, NVS, sensor faults, and a decoded panic on the sensor firmware. Wi-Fi, MQTT, and GPIO stay on a board. See [Testing with QEMU](guides/qemu.md).
 
 ## Target
 

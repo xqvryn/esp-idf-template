@@ -1,0 +1,63 @@
+dependencies:
+  channels:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    - name: runtime
+      path: ../runtime
+      version: 3.0.0
+    source:
+      path: ../../components/channels
+      type: local
+    version: 3.0.0
+  flight:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    - name: motion
+      path: ../motion
+      version: 3.0.0
+    - name: parameters
+      path: ../parameters
+      version: 3.0.0
+    source:
+      path: ../../components/flight
+      type: local
+    version: 3.0.0
+  idf:
+    source:
+      type: idf
+    version: 5.4.2
+  motion:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/motion
+      type: local
+    version: 3.0.0
+  parameters:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/parameters
+      type: local
+    version: 3.0.0
+  runtime:
+    dependencies:
+    - name: idf
+      version: '>=5.4'
+    source:
+      path: ../../components/runtime
+      type: local
+    version: 3.0.0
+direct_dependencies:
+- channels
+- flight
+- idf
+- motion
+- parameters
+manifest_hash: 2af0687768bcad73eface5b368df1f61d4d687d117d2ffcde4dc94f1a300aceb
+target: esp32s3
+version: 2.0.0
