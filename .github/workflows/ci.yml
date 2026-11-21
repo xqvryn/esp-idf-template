@@ -206,9 +206,34 @@ jobs:
           python -m pip install -r requirements-qemu.txt
           python3 tools/qemu_smoke.py
 
+  qemu-scenarios:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    container: espressif/idf:v5.4.2@sha256:4317595a911886e04cbc6d731315d5fc2918e510b6733fc7d03381ab2d270082
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install qemu-xtensa and run scenarios
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install --yes libslirp0
+          . "$IDF_PATH/export.sh"
+          python "$IDF_PATH/tools/idf_tools.py" install qemu-xtensa
+          . "$IDF_PATH/export.sh"
+          python -m pip install -r requirements-qemu.txt
+          python3 tests/qemu/run.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: qemu-scenario-logs
+          path: |
+            build/qemu-harness/logs
+            build/qemu-harness/junit.xml
+          if-no-files-found: ignore
+
   ci-required:
     if: always()
-    needs: [pr-title, version, host-tests, documentation, release-tooling, firmware, qemu-smoke]
+    needs: [pr-title, version, host-tests, documentation, release-tooling, firmware, qemu-smoke, qemu-scenarios]
     runs-on: ubuntu-24.04
     steps:
       - name: Require every validation job to succeed

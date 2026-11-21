@@ -33,7 +33,7 @@ Add domain-specific boundary tests when control rules grow.
 
 ## QEMU
 
-`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, and `examples/simulation` in Espressif's ESP32-S3 QEMU. Install steps and the limits (no Wi-Fi, no GPIO, no serial command prompt) are in [Run in QEMU](guides/qemu.md).
+`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, and `examples/simulation`. `python3 tests/qemu/run.py` drives commands, NVS, sensor faults, and a decoded panic on the sensor firmware. Wi-Fi, MQTT, and GPIO stay on a board. See [Testing with QEMU](guides/qemu.md).
 
 ## Target
 

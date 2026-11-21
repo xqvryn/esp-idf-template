@@ -50,3 +50,15 @@ config ESPKIT_REMOTE_COMMANDS
         or drive a physical output. Accepted commands still pass through
         the local TimedOutput policy.
 endmenu
+
+menu "ESPKit QEMU harness"
+config ESPKIT_QEMU_HARNESS
+    bool "Serial harness for scripted QEMU tests"
+    default n
+    depends on ESPKIT_PROFILE_SENSOR
+    help
+        Reads "espkit ..." lines from the console UART and drives the
+        sensor, command ingress, and NVS store. Leave this off for
+        production firmware. tests/qemu enables it with
+        sdkconfig.defaults.qemu.
+endmenu
