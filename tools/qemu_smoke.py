@@ -65,6 +65,11 @@ CASES = (
         ("output_mode=simulated", "requested=0"),
         require_network_disabled=True,
     ),
+    Case(
+        "example-drone",
+        "examples/drone",
+        ("simulation only: arm=0 motor_sum=0.00", "pins=simulated"),
+    ),
 )
 
 

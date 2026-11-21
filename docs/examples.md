@@ -16,6 +16,7 @@ CI compiles every example for `esp32s3`. Compilation does not flash a board.
 | [Sensor node](examples/sensor-node.md) | A synthetic 23.5 reading, sampled on its own task |
 | [Actuator node](examples/actuator-node.md) | ON until the one-second run limit latches a fault |
 | [Simulation](examples/simulation.md) | Sensor, control, and reporter tasks. Output requested off |
+| [Drone](guides/building-a-drone.md) | Quadcopter skeleton. Simulation-verified only, disarmed at boot |
 
 ## Sensor node
 

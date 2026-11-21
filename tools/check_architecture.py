@@ -18,6 +18,7 @@ COMPONENTS = {
     'runtime_task': ROOT / 'components' / 'runtime_task',
     'motion': ROOT / 'components' / 'motion',
     'motion_port': ROOT / 'components' / 'motion_port',
+    'flight': ROOT / 'components' / 'flight',
     'domain': ROOT / 'applications' / 'node' / 'components' / 'domain',
     'application': ROOT / 'applications' / 'node' / 'components' / 'application',
     'node_drivers': ROOT / 'applications' / 'node' / 'components' / 'node_drivers',
@@ -35,6 +36,7 @@ ALLOWED = {
     'runtime_task': {'runtime'},
     'motion': set(),
     'motion_port': {'motion'},
+    'flight': {'motion', 'parameters'},
     'domain': set(),
     'application': {'domain', 'timed_output'},
     'node_drivers': {'domain', 'application'},
@@ -49,6 +51,7 @@ PORTABLE = {
     'runtime',
     'channels',
     'motion',
+    'flight',
 }
 
 

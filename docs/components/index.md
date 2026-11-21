@@ -15,6 +15,7 @@ These components are optional. A project compiles one only when it `REQUIRES` it
 | [runtime task](runtime-task.md) | Pinned FreeRTOS periodic task that feeds the loop budget |
 | [motion](motion.md) | IMU, PWM, DShot, and RC decoders, plus simulated backends |
 | [motion port](motion-port.md) | ESP-IDF peripherals, idle while every GPIO is `-1` |
+| [flight](flight.md) | Quadcopter skeleton. Simulation-verified only |
 
 How to depend on them from another repository is in [Use the components](../guides/components.md). Manifest version is `3.0.0`. They are not in the ESP Component Registry.
 
