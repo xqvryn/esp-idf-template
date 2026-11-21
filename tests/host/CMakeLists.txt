@@ -21,8 +21,9 @@ set(component_paths
     timed_output "${repo_root}/components/timed_output"
     runtime "${repo_root}/components/runtime"
     parameters "${repo_root}/components/parameters"
-    channels "${repo_root}/components/channels")
-foreach(component timed_output domain application node_drivers drivers configuration networking runtime parameters channels)
+    channels "${repo_root}/components/channels"
+    motion "${repo_root}/components/motion")
+foreach(component timed_output domain application node_drivers drivers configuration networking runtime parameters channels motion)
     list(FIND component_paths ${component} index)
     math(EXPR path_index "${index} + 1")
     list(GET component_paths ${path_index} component_dir)
@@ -42,8 +43,9 @@ add_executable(policy_tests
     test_settings_migration.cpp
     test_runtime.cpp
     test_parameters.cpp
-    test_channels.cpp)
+    test_channels.cpp
+    test_motion.cpp)
 target_compile_options(policy_tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
-target_link_libraries(policy_tests PRIVATE GTest::gtest_main domain application node_drivers drivers configuration networking timed_output runtime parameters channels)
+target_link_libraries(policy_tests PRIVATE GTest::gtest_main domain application node_drivers drivers configuration networking timed_output runtime parameters channels motion)
 include(GoogleTest)
 gtest_discover_tests(policy_tests)

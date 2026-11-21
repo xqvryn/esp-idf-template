@@ -16,6 +16,8 @@ COMPONENTS = {
     'parameters': ROOT / 'components' / 'parameters',
     'channels': ROOT / 'components' / 'channels',
     'runtime_task': ROOT / 'components' / 'runtime_task',
+    'motion': ROOT / 'components' / 'motion',
+    'motion_port': ROOT / 'components' / 'motion_port',
     'domain': ROOT / 'applications' / 'node' / 'components' / 'domain',
     'application': ROOT / 'applications' / 'node' / 'components' / 'application',
     'node_drivers': ROOT / 'applications' / 'node' / 'components' / 'node_drivers',
@@ -31,6 +33,8 @@ ALLOWED = {
     'parameters': set(),
     'channels': {'runtime'},
     'runtime_task': {'runtime'},
+    'motion': set(),
+    'motion_port': {'motion'},
     'domain': set(),
     'application': {'domain', 'timed_output'},
     'node_drivers': {'domain', 'application'},
@@ -44,6 +48,7 @@ PORTABLE = {
     'timed_output',
     'runtime',
     'channels',
+    'motion',
 }
 
 
