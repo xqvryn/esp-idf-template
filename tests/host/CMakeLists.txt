@@ -18,8 +18,11 @@ set(component_paths
     drivers "${repo_root}/components/drivers"
     configuration "${repo_root}/components/configuration"
     networking "${repo_root}/components/networking"
-    timed_output "${repo_root}/components/timed_output")
-foreach(component timed_output domain application node_drivers drivers configuration networking)
+    timed_output "${repo_root}/components/timed_output"
+    runtime "${repo_root}/components/runtime"
+    parameters "${repo_root}/components/parameters"
+    channels "${repo_root}/components/channels")
+foreach(component timed_output domain application node_drivers drivers configuration networking runtime parameters channels)
     list(FIND component_paths ${component} index)
     math(EXPR path_index "${index} + 1")
     list(GET component_paths ${path_index} component_dir)
@@ -36,8 +39,11 @@ add_executable(policy_tests
     test_lifecycle.cpp
     test_commands.cpp
     test_output_quiesce.cpp
-    test_settings_migration.cpp)
+    test_settings_migration.cpp
+    test_runtime.cpp
+    test_parameters.cpp
+    test_channels.cpp)
 target_compile_options(policy_tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
-target_link_libraries(policy_tests PRIVATE GTest::gtest_main domain application node_drivers drivers configuration networking timed_output)
+target_link_libraries(policy_tests PRIVATE GTest::gtest_main domain application node_drivers drivers configuration networking timed_output runtime parameters channels)
 include(GoogleTest)
 gtest_discover_tests(policy_tests)

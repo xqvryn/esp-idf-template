@@ -1,0 +1,6 @@
+version: "3.0.0"
+description: "Task spec, service lifecycle, loop budget, and bounded SPSC queues"
+url: "https://github.com/xqvryn/esp-idf-template"
+license: "MIT"
+dependencies:
+  idf: ">=5.4"

@@ -12,6 +12,10 @@ COMPONENTS = {
     'networking': ROOT / 'components' / 'networking',
     'drivers': ROOT / 'components' / 'drivers',
     'timed_output': ROOT / 'components' / 'timed_output',
+    'runtime': ROOT / 'components' / 'runtime',
+    'parameters': ROOT / 'components' / 'parameters',
+    'channels': ROOT / 'components' / 'channels',
+    'runtime_task': ROOT / 'components' / 'runtime_task',
     'domain': ROOT / 'applications' / 'node' / 'components' / 'domain',
     'application': ROOT / 'applications' / 'node' / 'components' / 'application',
     'node_drivers': ROOT / 'applications' / 'node' / 'components' / 'node_drivers',
@@ -23,12 +27,24 @@ ALLOWED = {
     'networking': {'configuration'},
     'drivers': set(),
     'timed_output': set(),
+    'runtime': set(),
+    'parameters': set(),
+    'channels': {'runtime'},
+    'runtime_task': {'runtime'},
     'domain': set(),
     'application': {'domain', 'timed_output'},
     'node_drivers': {'domain', 'application'},
     'wiring': {'domain', 'application', 'platform', 'drivers', 'node_drivers'},
 }
-PORTABLE = {'drivers', 'domain', 'application', 'node_drivers', 'timed_output'}
+PORTABLE = {
+    'drivers',
+    'domain',
+    'application',
+    'node_drivers',
+    'timed_output',
+    'runtime',
+    'channels',
+}
 
 
 def main() -> int:
