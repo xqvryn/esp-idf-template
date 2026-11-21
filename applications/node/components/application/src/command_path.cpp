@@ -11,8 +11,7 @@ namespace {
 // must not treat it as a shorter lease.
 bool checked_nonnegative_add(domain::Milliseconds left, domain::Milliseconds right,
                              domain::Milliseconds& sum) noexcept {
-    if (left < 0 || right < 0 ||
-        left > std::numeric_limits<domain::Milliseconds>::max() - right) {
+    if (left < 0 || right < 0 || left > std::numeric_limits<domain::Milliseconds>::max() - right) {
         return false;
     }
     sum = left + right;
