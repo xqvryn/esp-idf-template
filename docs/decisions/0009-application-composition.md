@@ -44,6 +44,8 @@ Classification of the code that exists today:
 | Pinned periodic FreeRTOS task | Optional component `components/runtime_task`. It calls one `step()` |
 | Typed parameter table and NVS blob | Optional component `components/parameters`. A command handler calls `write_text`; the sensor envelope is unchanged |
 | Structured record channel and latest telemetry sample | Optional component `components/channels` |
+| IMU, PWM, DShot, and RC decoders with simulated backends | Optional component `components/motion`. Pin numbers stay `-1` until a board profile sets them |
+| ESP-IDF LEDC, MCPWM, RMT, I2C, SPI, and SBUS UART | Optional component `components/motion_port`. It does nothing while every GPIO is `-1` |
 | Irrigation policy | Smart-farm application only. Not in this template |
 | Application workers, command ingress, quiesce, telemetry JSON, command envelope | Sensor/actuator application under `applications/node/` |
 | Synthetic sensor and simulated output | That same application (`node_drivers`), not the reusable driver |

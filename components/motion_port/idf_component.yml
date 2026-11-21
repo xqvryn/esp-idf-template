@@ -1,0 +1,9 @@
+version: "3.0.0"
+description: "ESP-IDF bindings for motion pins that a board profile sets"
+url: "https://github.com/xqvryn/esp-idf-template"
+license: "MIT"
+dependencies:
+  idf: ">=5.4"
+  motion:
+    path: "../motion"
+    version: "3.0.0"

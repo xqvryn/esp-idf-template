@@ -33,8 +33,10 @@ Add domain-specific boundary tests when control rules grow.
 Runtime tests cover task-spec rejection, a scripted service, loop-budget jitter
 and skipped deadlines, a full SPSC queue, and a latest-value mailbox. Parameter
 tests cover range checks, `write_text` assignment, and a memory-store round trip.
-Channel tests cover a dropped record and a replaced telemetry sample. Those
-tests do not open NVS or start FreeRTOS.
+Channel tests cover a dropped record and a replaced telemetry sample.
+Motion tests cover MPU-6050 and ICM-42688 scale conversion, a scripted I2C burst,
+pulse clamping, a DShot frame, SBUS failsafe, and PPM sync. Those tests do not
+open NVS, start FreeRTOS, or program a GPIO.
 
 ## QEMU
 

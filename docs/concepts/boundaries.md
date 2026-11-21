@@ -13,6 +13,8 @@ This is the accepted split from [ADR 0009](../decisions/0009-application-composi
 | Pinned periodic task | Optional `components/runtime_task` |
 | Parameter registry and its NVS blob | Optional `components/parameters` |
 | Structured records and latest telemetry | Optional `components/channels` |
+| IMU, PWM, DShot, and RC decoders | Optional `components/motion` |
+| Peripheral setup for those decoders | Optional `components/motion_port` |
 | Irrigation policy | A smart-farm application only. Not in this template |
 | Application workers, command ingress, quiesce, telemetry JSON, command envelope | `applications/node/` |
 | Synthetic sensor and simulated output | That same application (`node_drivers`), not the reusable driver |

@@ -25,6 +25,8 @@ Each reusable component has an `idf_component.yml` with version `3.0.0`, a descr
 | `parameters` | `components/parameters/idf_component.yml` | ESP-IDF |
 | `channels` | `components/channels/idf_component.yml` | `runtime` |
 | `runtime_task` | `components/runtime_task/idf_component.yml` | `runtime` |
+| `motion` | `components/motion/idf_component.yml` | ESP-IDF |
+| `motion_port` | `components/motion_port/idf_component.yml` | `motion` |
 
 Add the components you call to `main/idf_component.yml`:
 

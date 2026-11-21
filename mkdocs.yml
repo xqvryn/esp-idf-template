@@ -109,6 +109,8 @@ nav:
       - Parameters: components/parameters.md
       - Channels: components/channels.md
       - Runtime task: components/runtime-task.md
+      - Motion: components/motion.md
+      - Motion port: components/motion-port.md
   - Examples:
       - Overview: examples.md
       - Minimal: examples/minimal.md
