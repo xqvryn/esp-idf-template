@@ -23,7 +23,7 @@ class Espkit:
     def status(self, timeout: int = 5) -> tuple[int, int, str, int]:
         self.dut.write("espkit status")
         matched = self.dut.expect(
-            r"espkit: output=(\d) fault=(\d) state=(\w+) value=[0-9.eE+-]+ valid=\d uptime=(\d+)",
+            r"espkit: output=(\d) fault=(\d) state=(\w+) value=[0-9.eE+-]+ valid=\d uptime=(\d+)\r?\n",
             timeout=timeout,
         )
         return int(matched.group(1)), int(matched.group(2)), matched.group(3), int(matched.group(4))
