@@ -30,14 +30,14 @@ dependencies:
   configuration:
     git: https://github.com/xqvryn/esp-idf-template.git
     path: components/configuration
-    version: main
+    version: v3.0.0
   networking:
     git: https://github.com/xqvryn/esp-idf-template.git
     path: components/networking
-    version: main
+    version: v3.0.0
 ```
 
-Replace `version: main` with a tag after `v3.0.0` exists. `git`, `path`, and `version` select one directory inside the repository. Then `REQUIRES` or `PRIV_REQUIRES` that component from CMake.
+`version: v3.0.0` selects that tag. The repository is public, so this `git` dependency works without a token. `git`, `path`, and `version` select one directory inside the repository. Then `REQUIRES` or `PRIV_REQUIRES` that component from CMake.
 
 These manifests are **not** uploaded to the ESP Component Registry. Do not add a registry dependency until a maintainer publishes them.
 
