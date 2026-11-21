@@ -17,6 +17,13 @@
 #include "platform/clock.hpp"
 #include "platform/i2c.hpp"
 #include "platform/periodic_task.hpp"
+#include "sdkconfig.h"
+#if CONFIG_ESPKIT_SENSOR_SHT3X && CONFIG_ESPKIT_QEMU_HARNESS
+#error The QEMU harness scripts the synthetic sensor. Disable CONFIG_ESPKIT_SENSOR_SHT3X.
+#endif
+#if CONFIG_ESPKIT_QEMU_HARNESS
+#include "qemu_harness.hpp"
+#endif
 #include "wiring/fifo.hpp"
 #include "wiring/log_telemetry.hpp"
 #include "wiring/snapshot.hpp"
@@ -31,7 +38,7 @@ namespace app = application;
 
 namespace {
 
-#if CONFIG_ESPKIT_REMOTE_COMMANDS
+#if CONFIG_ESPKIT_QEMU_HARNESS || CONFIG_ESPKIT_REMOTE_COMMANDS
 constexpr bool remote_commands_enabled = true;
 #else
 constexpr bool remote_commands_enabled = false;
@@ -169,6 +176,9 @@ class DeviceRuntime {
             std::abort();
         }
 #endif
+#if CONFIG_ESPKIT_QEMU_HARNESS
+        qemu_harness::start({ingress_, clock_, policy_, output_, sensor_});
+#endif
     }
 
     private:
@@ -185,6 +195,8 @@ class DeviceRuntime {
     BoardDelay delay_;
     drivers::Sht3xSensor sht_{bus_, delay_};
     Sht3xSource sensor_{sht_};
+#elif CONFIG_ESPKIT_QEMU_HARNESS
+    qemu_harness::ScriptedSensor sensor_{defaults::synthetic_reading};
 #else
     drivers::SyntheticSensor sensor_{defaults::synthetic_reading};
 #endif

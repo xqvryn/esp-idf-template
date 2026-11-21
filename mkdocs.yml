@@ -92,6 +92,7 @@ nav:
       - Use the components: guides/components.md
       - Board porting: board-porting.md
       - Testing: testing.md
+      - Testing with QEMU: guides/qemu.md
       - CI and releases: guides/releases.md
       - Release details: releases.md
       - Repository setup: repository-setup.md
