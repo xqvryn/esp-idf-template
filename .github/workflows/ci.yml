@@ -189,9 +189,26 @@ jobs:
           path: release-assets/${{ matrix.name }}/
           if-no-files-found: error
 
+  qemu-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    container: espressif/idf:v5.4.2@sha256:4317595a911886e04cbc6d731315d5fc2918e510b6733fc7d03381ab2d270082
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install qemu-xtensa and boot
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install --yes libslirp0
+          . "$IDF_PATH/export.sh"
+          python "$IDF_PATH/tools/idf_tools.py" install qemu-xtensa
+          . "$IDF_PATH/export.sh"
+          python -m pip install -r requirements-qemu.txt
+          python3 tools/qemu_smoke.py
+
   ci-required:
     if: always()
-    needs: [pr-title, version, host-tests, documentation, release-tooling, firmware]
+    needs: [pr-title, version, host-tests, documentation, release-tooling, firmware, qemu-smoke]
     runs-on: ubuntu-24.04
     steps:
       - name: Require every validation job to succeed

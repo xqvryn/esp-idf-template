@@ -8,6 +8,7 @@ Every push and pull request runs, without secrets:
 - host tests
 - a strict documentation build
 - ESP32-S3 firmware builds for the root project, each application profile, the Unity test app, and every example
+- a QEMU boot of the minimal example, the three root profiles, and `examples/simulation` (`qemu-smoke`)
 
 The networking-only example fails CI if the node application libraries appear in its build graph.
 

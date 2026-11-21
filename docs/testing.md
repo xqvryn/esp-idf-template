@@ -31,6 +31,10 @@ Boot-health tests hold, confirm, or refuse from a completed control step and the
 applied output. Both broker flags are compared and produce the same decision.
 Add domain-specific boundary tests when control rules grow.
 
+## QEMU
+
+`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, and `examples/simulation` in Espressif's ESP32-S3 QEMU. Install steps and the limits (no Wi-Fi, no GPIO, no serial command prompt) are in [Run in QEMU](guides/qemu.md).
+
 ## Target
 
 A Unity policy smoke test lives in `applications/node/components/domain/test/`, with a dedicated
