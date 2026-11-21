@@ -6,6 +6,19 @@ namespace application {
 
 namespace {
 
+// Both operands are durations or elapsed time, never negative here. A sum that
+// does not fit in int64 is longer than every stored duration, so the caller
+// must not treat it as a shorter lease.
+bool checked_nonnegative_add(domain::Milliseconds left, domain::Milliseconds right,
+                             domain::Milliseconds& sum) noexcept {
+    if (left < 0 || right < 0 ||
+        left > std::numeric_limits<domain::Milliseconds>::max() - right) {
+        return false;
+    }
+    sum = left + right;
+    return true;
+}
+
 domain::CommandStatus rejection_status(domain::CommandValidation validation) noexcept {
     switch (validation) {
     case domain::CommandValidation::invalid:
@@ -252,10 +265,13 @@ void CommandRequests::adopt(const domain::Command& command, domain::Milliseconds
         active_.expires_at = command.expires_at;
         return;
     }
-    const auto current_end = active_.started_at + active_.duration_ms;
-    const auto proposed_end = now + command.max_duration_ms;
-    if (proposed_end < current_end) {
-        active_.duration_ms = proposed_end - active_.started_at;
+    // Compare spans from the lease start. now + duration and started_at + duration
+    // both overflow when the clock is near int64 max, even if the shorter span fits.
+    const auto elapsed = now - active_.started_at;
+    domain::Milliseconds proposed_span = 0;
+    if (checked_nonnegative_add(elapsed, command.max_duration_ms, proposed_span) &&
+        proposed_span < active_.duration_ms) {
+        active_.duration_ms = proposed_span;
     }
     if (command.expires_at < active_.expires_at) {
         active_.expires_at = command.expires_at;
