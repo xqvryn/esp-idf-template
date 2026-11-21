@@ -8,6 +8,7 @@ It is not the chip target and it is not a board pin map.
 | `minimal` | `profiles/minimal/app_main.cpp`. One log line. No sensor, actuator, domain, or networking components |
 | `sensor` | The default composition in `main/device.cpp`: sample, local control, and reporting. This is the historical root firmware |
 | `actuator` | `profiles/actuator/app_main.cpp`, the same loop as `examples/actuator-node` |
+| `drone` | `profiles/drone/app_main.cpp`, the same loop as `examples/drone`. Simulation only |
 
 `examples/minimal`, `examples/sensor-node`, and `examples/actuator-node` stay
 standalone projects. The actuator example compiles `profiles/actuator/app_main.cpp`

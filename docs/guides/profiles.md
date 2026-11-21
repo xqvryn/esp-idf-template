@@ -11,7 +11,7 @@ idf.py -DESPKIT_PROFILE=minimal set-target esp32s3
 idf.py -DESPKIT_PROFILE=minimal build
 ```
 
-Use `sensor` or `actuator` the same way. The chip target stays `esp32s3` in these commands. Pass a board defaults file separately when you have one. See [Three axes](../concepts/axes.md).
+Use `sensor`, `actuator`, or `drone` the same way. The chip target stays `esp32s3` in these commands. Pass a board defaults file separately when you have one. See [Three axes](../concepts/axes.md). The drone profile is simulation-only. See [Building a drone](building-a-drone.md).
 
 ## What the flag changes
 

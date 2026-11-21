@@ -35,8 +35,10 @@ and skipped deadlines, a full SPSC queue, and a latest-value mailbox. Parameter
 tests cover range checks, `write_text` assignment, and a memory-store round trip.
 Channel tests cover a dropped record and a replaced telemetry sample.
 Motion tests cover MPU-6050 and ICM-42688 scale conversion, a scripted I2C burst,
-pulse clamping, a DShot frame, SBUS failsafe, and PPM sync. Those tests do not
-open NVS, start FreeRTOS, or program a GPIO.
+pulse clamping, a DShot frame, SBUS failsafe, and PPM sync. Flight tests arm a
+quad only with low throttle, return a tilted rigid body toward level, track a
+stick step, and force zero motors on RC loss, low battery, and the kill switch.
+Those tests do not open NVS, start FreeRTOS, or program a GPIO.
 
 ## QEMU
 

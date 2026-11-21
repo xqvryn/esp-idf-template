@@ -3,7 +3,7 @@ choice ESPKIT_APPLICATION_PROFILE
     default ESPKIT_PROFILE_SENSOR
     help
         Selects which application sources the root project compiles.
-        Pass -DESPKIT_PROFILE=minimal, sensor, or actuator to idf.py.
+        Pass -DESPKIT_PROFILE=minimal, sensor, actuator, or drone to idf.py.
         This is not the chip target and not a board pin profile.
         Delete sdkconfig before switching profiles.
 
@@ -13,6 +13,8 @@ choice ESPKIT_APPLICATION_PROFILE
         bool "Sensor node composition"
     config ESPKIT_PROFILE_ACTUATOR
         bool "Actuator node"
+    config ESPKIT_PROFILE_DRONE
+        bool "Drone skeleton (simulation only)"
 endchoice
 
 menu "ESPKit board and sensor"
