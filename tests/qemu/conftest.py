@@ -18,8 +18,6 @@ class Espkit:
 
     def send(self, line: str, pattern: str, timeout: int = 10):
         self.dut.write(line)
-        if not pattern.endswith(r"\n") and not pattern.endswith("\n"):
-            pattern = pattern + r"\r?\n"
         return self.dut.expect(pattern, timeout=timeout)
 
     def status(self, timeout: int = 5) -> tuple[int, int, str, int]:

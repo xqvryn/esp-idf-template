@@ -2,7 +2,7 @@
 
 
 def test_on_expires_without_a_fault(espkit):
-    matched = espkit.send(r"espkit on 400", r"command status=accepted now=(\d+)")
+    matched = espkit.send(r"espkit on 400", r"command status=accepted now=(\d+)\r?\n")
     accepted_at = int(matched.group(1))
     running_at = espkit.wait_status(1, 0)
     stopped_at = espkit.wait_status(0, 0)
