@@ -8,10 +8,10 @@ release for a tag is the full note.
 
 ## 3.3.0
 
-The simulation-only quadcopter skeleton gained a 6-DOF host plant, mixer
-desaturation, tilt and IMU-age arming checks, a QEMU failsafe log, and a
-props-off pre-flight checklist. It is not flight-tested. The stable tag for
-this work is `v3.3.0` after promotion to `main`.
+Released as `v3.3.0` on `main` (2026-11-22). The simulation-only quadcopter
+skeleton gained a 6-DOF host plant, mixer desaturation, tilt and IMU-age
+arming checks, a QEMU failsafe log, and a props-off pre-flight checklist. It
+is not flight-tested.
 
 ## 3.2.0
 

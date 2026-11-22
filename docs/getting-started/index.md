@@ -10,7 +10,7 @@ cd my-app
 git checkout main
 ```
 
-That copy includes the build, CI, host tests, and docs. It does **not** receive later ESPKit commits. The command includes every branch because the template default branch is `develop`; `main` is the current stable tag (`v3.2.0`). If you already have a project and only want networking or storage, use [components](../guides/components.md) instead of copying the template. More detail is in [Create a project](create-project.md).
+That copy includes the build, CI, host tests, and docs. It does **not** receive later ESPKit commits. The command includes every branch because the template default branch is `develop`; `main` is the current stable tag (`v3.3.0`). If you already have a project and only want networking or storage, use [components](../guides/components.md) instead of copying the template. More detail is in [Create a project](create-project.md).
 
 You need [ESP-IDF 5.4.2](installation.md) on your machine, or Docker. The commands below assume the `idf.py` from that release is on your `PATH`.
 
