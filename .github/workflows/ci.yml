@@ -112,6 +112,20 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run check:release
 
+  component-registry:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Install Component Manager
+        run: python -m pip install 'idf-component-manager>=2.2,<3'
+      - name: Pack reusable components
+        env:
+          IDF_COMPONENT_API_TOKEN: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
+        run: python3 tools/component_registry.py dry-run
+
   firmware:
     needs: version
     runs-on: ubuntu-24.04
@@ -238,7 +252,7 @@ jobs:
 
   ci-required:
     if: always()
-    needs: [pr-title, version, host-tests, documentation, release-tooling, firmware, qemu-smoke, qemu-scenarios]
+    needs: [pr-title, version, host-tests, documentation, release-tooling, component-registry, firmware, qemu-smoke, qemu-scenarios]
     runs-on: ubuntu-24.04
     steps:
       - name: Require every validation job to succeed

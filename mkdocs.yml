@@ -91,6 +91,7 @@ nav:
       - Build profiles: guides/profiles.md
       - Building a drone: guides/building-a-drone.md
       - Use the components: guides/components.md
+      - Publish components to the registry: guides/component-registry.md
       - Board porting: board-porting.md
       - Testing: testing.md
       - Testing with QEMU: guides/qemu.md
