@@ -23,8 +23,7 @@ idf.py -DESPKIT_PROFILE=minimal set-target esp32s3
 idf.py -DESPKIT_PROFILE=minimal build
 ```
 
-Replace `minimal` with `sensor` or `actuator`. Omit `-DESPKIT_PROFILE` to build
-`sensor`.
+Replace `minimal` with `sensor`, `actuator`, or `drone`. The drone profile is simulation-only; see [Building a drone](../docs/guides/building-a-drone.md). Omit `-DESPKIT_PROFILE` to build `sensor`.
 
 `idf.py set-target esp32s3` still selects the chip. A board profile, when one
 exists, is an extra `sdkconfig` defaults file supplied through

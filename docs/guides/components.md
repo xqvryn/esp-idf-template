@@ -5,8 +5,10 @@ Copy the GitHub template when you want a new firmware repository. Depend on indi
 ## From a new repository
 
 ```sh
-gh repo create my-app --template xqvryn/esp-idf-template --private --clone
+gh repo create my-app --template xqvryn/esp-idf-template --private --include-all-branches --clone
 ```
+
+That form also copies `main`. See [Create a project](../getting-started/create-project.md) if you only need `develop`.
 
 Delete the examples you do not need. Upstream fixes do not flow into that copy.
 

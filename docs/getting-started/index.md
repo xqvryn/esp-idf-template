@@ -5,11 +5,12 @@ Create a new repository from the ESPKit template, then build the minimal example
 ## 1. Create the repository
 
 ```sh
-gh repo create my-app --template xqvryn/esp-idf-template --private --clone
+gh repo create my-app --template xqvryn/esp-idf-template --private --include-all-branches --clone
 cd my-app
+git checkout main
 ```
 
-That copy includes the build, CI, host tests, and docs. It does **not** receive later ESPKit commits. If you already have a project and only want networking or storage, use [components](../guides/components.md) instead of copying the template.
+That copy includes the build, CI, host tests, and docs. It does **not** receive later ESPKit commits. The command includes every branch because the template default branch is `develop`; `main` is the current stable tag (`v3.2.0`). If you already have a project and only want networking or storage, use [components](../guides/components.md) instead of copying the template. More detail is in [Create a project](create-project.md).
 
 You need [ESP-IDF 5.4.2](installation.md) on your machine, or Docker. The commands below assume the `idf.py` from that release is on your `PATH`.
 
