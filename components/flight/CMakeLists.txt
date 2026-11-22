@@ -1,4 +1,4 @@
-set(portable_sources "src/controller.cpp")
+set(portable_sources "src/controller.cpp" "src/plant.cpp")
 if(COMMAND idf_component_register)
     idf_component_register(SRCS ${portable_sources} INCLUDE_DIRS "include" REQUIRES motion parameters)
 else()

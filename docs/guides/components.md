@@ -12,7 +12,7 @@ Delete the examples you do not need. Upstream fixes do not flow into that copy.
 
 ## From an existing ESP-IDF project
 
-Each reusable component has an `idf_component.yml` with version `3.2.0`, a description, homepage, documentation, issues, Git repository, `repository_info.path`, the MIT license, a `files` exclude list, and `idf: ">=5.4"`.
+Each reusable component has an `idf_component.yml` with version `3.3.0`, a description, homepage, documentation, issues, Git repository, `repository_info.path`, the MIT license, a `files` exclude list, and `idf: ">=5.4"`.
 
 | Component | Manifest | Needs |
 | --- | --- | --- |
@@ -37,14 +37,14 @@ dependencies:
   configuration:
     git: https://github.com/xqvryn/esp-idf-template.git
     path: components/configuration
-    version: v3.2.0
+    version: v3.3.0
   networking:
     git: https://github.com/xqvryn/esp-idf-template.git
     path: components/networking
-    version: v3.2.0
+    version: v3.3.0
 ```
 
-`version: v3.2.0` selects that release tag (use the latest stable tag). The repository is public, so this `git` dependency works without a token. `git`, `path`, and `version` select one directory inside the repository. Then `REQUIRES` or `PRIV_REQUIRES` that component from CMake.
+`version: v3.3.0` selects that release tag (use the latest stable tag). The repository is public, so this `git` dependency works without a token. `git`, `path`, and `version` select one directory inside the repository. Then `REQUIRES` or `PRIV_REQUIRES` that component from CMake.
 
 Once a maintainer has published to the ESP Component Registry, the same components can be pulled by name. Until that upload happens, prefer the `git` form above.
 
@@ -52,9 +52,9 @@ Once a maintainer has published to the ESP Component Registry, the same componen
 dependencies:
   idf: ">=5.4"
   xqvryn/configuration:
-    version: "^3.2.0"
+    version: "^3.3.0"
   xqvryn/networking:
-    version: "^3.2.0"
+    version: "^3.3.0"
 ```
 
 How packaging and the optional publish job work is in [Publish components to the registry](component-registry.md).

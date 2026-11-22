@@ -29,6 +29,8 @@ struct Gains {
 struct Limits {
     float throttle_arm_max{0.05F};
     float battery_min_v{10.0F};
+    float max_arm_tilt_rad{0.2F};
+    float imu_max_age_s{0.05F};
 };
 
 struct Pilot {
@@ -64,6 +66,7 @@ struct AxisLoop {
 struct Vehicle {
     ArmState arm{ArmState::disarmed};
     bool arm_switch_released{true};
+    std::int64_t last_imu_time_us{0};
     Attitude attitude{};
     Motors motors{};
     AxisLoop roll_angle{};
@@ -76,6 +79,8 @@ struct Vehicle {
 
 // Quad X, motors front-right, rear-right, rear-left, front-left.
 // Positive roll raises the left motors. Positive pitch raises the front motors.
+// Commands that fall outside [0, 1] are shifted or scaled together so a
+// differential is not clipped on one motor only.
 void mix_quad_x(float throttle, float roll, float pitch, float yaw, Motors& motors) noexcept;
 
 bool define_flight_parameters(parameters::Registry& registry, const Gains& gains,
@@ -85,6 +90,9 @@ bool load_flight_parameters(const parameters::Registry& registry, Gains& gains,
 
 void reset_vehicle(Vehicle& vehicle) noexcept;
 // dt_s must be positive. Disarmed, failsafe, and kill outputs are exactly zero.
+// Arming also requires tilt at or below max_arm_tilt_rad, measured from the
+// accelerometer. A frozen or over-age imu.time_us enters failsafe when both
+// the sample and the vehicle already have a non-zero timestamp.
 void step_vehicle(Vehicle& vehicle, const Pilot& pilot, const Gains& gains, const Limits& limits,
                   const motion::ImuSample& imu, float dt_s) noexcept;
 

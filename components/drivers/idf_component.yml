@@ -1,4 +1,4 @@
-version: "3.2.0"
+version: "3.3.0"
 description: "SHT3x-DIS temperature and humidity driver"
 url: "https://xqvryn.github.io/esp-idf-template/"
 documentation: "https://xqvryn.github.io/esp-idf-template/components/drivers/"

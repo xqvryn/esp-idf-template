@@ -6,7 +6,7 @@ dependencies:
     source:
       path: ../../components/configuration
       type: local
-    version: 3.2.0
+    version: 3.3.0
   idf:
     source:
       type: idf
@@ -17,11 +17,11 @@ dependencies:
       version: '>=5.4'
     - name: configuration
       path: ../configuration
-      version: 3.2.0
+      version: 3.3.0
     source:
       path: ../../components/networking
       type: local
-    version: 3.2.0
+    version: 3.3.0
 direct_dependencies:
 - configuration
 - idf

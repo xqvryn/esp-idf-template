@@ -8,6 +8,7 @@ namespace motion {
 struct ImuSample {
     float accel_m_s2[3]{0, 0, 0};
     float gyro_rad_s[3]{0, 0, 0};
+    std::int64_t time_us{0};
     bool valid{false};
 };
 

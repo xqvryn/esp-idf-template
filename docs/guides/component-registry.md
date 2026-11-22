@@ -8,7 +8,7 @@ This page is about packaging and publishing. Downstream usage, including registr
 
 Pull requests and pushes pack every reusable component with `compote component pack`. That validates the manifest and builds an archive; it does not create a registry version. If `IDF_COMPONENT_API_TOKEN` is present, CI also runs `compote component upload --dry-run` for an extra registry-side check, still without publishing.
 
-On a stable tag such as `v3.2.0`, a separate workflow publishes those archives to the `xqvryn` namespace, but only when `IDF_COMPONENT_API_TOKEN` is set. If the secret is missing, the job succeeds and prints that it skipped the upload. Prerelease tags such as `v3.2.0-dev.1` are skipped. The token is never created or requested by automation.
+On a stable tag such as `v3.3.0`, a separate workflow publishes those archives to the `xqvryn` namespace, but only when `IDF_COMPONENT_API_TOKEN` is set. If the secret is missing, the job succeeds and prints that it skipped the upload. Prerelease tags such as `v3.3.0-dev.1` are skipped. The token is never created or requested by automation.
 
 Pack everything locally after installing the Component Manager:
 
