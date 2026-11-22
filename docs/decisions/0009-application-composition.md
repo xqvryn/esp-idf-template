@@ -88,9 +88,11 @@ Breaking source adjustments inside this repository:
 
 ## Follow-ups
 
-- Component manifests live next to `platform`, `configuration`, `networking`,
-  and `drivers`. Examples consume them with path dependencies. They are not
-  uploaded to the component registry. See [Use the components](../guides/components.md).
+- Component manifests live next to each reusable component under `components/`.
+  Examples consume them with path dependencies. CI packs those manifests, and a
+  tag can publish them to the ESP Component Registry when
+  `IDF_COMPONENT_API_TOKEN` is set. See [Use the components](../guides/components.md)
+  and [Publish components to the registry](../guides/component-registry.md).
 - `TimedOutput` is `components/timed_output` and does not include `Reading`.
   The control worker turns a non-finite measurement into an invalid sample time.
 - `LogTelemetry` stays in node wiring. It prints sensor status. General logging

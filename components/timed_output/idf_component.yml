@@ -1,6 +1,15 @@
-version: "3.0.0"
+version: "3.2.0"
 description: "Timed output state machine with a maximum run and sample age"
-url: "https://github.com/xqvryn/esp-idf-template"
+url: "https://xqvryn.github.io/esp-idf-template/"
+documentation: "https://xqvryn.github.io/esp-idf-template/components/timed-output/"
+issues: "https://github.com/xqvryn/esp-idf-template/issues"
+repository: "https://github.com/xqvryn/esp-idf-template.git"
+repository_info:
+  path: "components/timed_output"
 license: "MIT"
+files:
+  exclude:
+    - "test/**/*"
+    - "**/test/**/*"
 dependencies:
   idf: ">=5.4"
