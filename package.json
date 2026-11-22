@@ -11,9 +11,9 @@
     "plan:release": "node tools/release_plan.mjs"
   },
   "devDependencies": {
-    "semantic-release": "25.0.9",
+    "semantic-release": "26.0.1",
     "@semantic-release/commit-analyzer": "13.0.1",
     "@semantic-release/release-notes-generator": "14.1.1",
-    "@semantic-release/github": "12.0.10"
+    "@semantic-release/github": "12.0.11"
   }
 }
