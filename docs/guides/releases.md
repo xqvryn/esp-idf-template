@@ -45,6 +45,6 @@ semantic-release then creates the git tag and the GitHub Release. A push of the 
 2. Promote `develop` to `main` with a **merge commit**, not a squash. Release analysis needs the original commits.
 3. Merge `main` back into `develop`. A develop release is refused until `main` is an ancestor of `develop`.
 
-The current stable tag is `v3.2.0` on `main`. Released stable versions are listed in the [changelog](../changelog.md).
+The current stable tag is `v3.3.0` on `main`. Released stable versions are listed in the [changelog](../changelog.md).
 
 Full rules, including the firmware archive checks, are in [Release details](../releases.md).

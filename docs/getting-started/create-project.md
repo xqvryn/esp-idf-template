@@ -15,7 +15,7 @@ The full first build is [Getting started](index.md). In short:
 3. Rename the root CMake project if you do not want the name `device`.
 4. Choose a [profile](../guides/profiles.md) only when you are building the root firmware.
 
-A template copy starts a new Git history. It does not receive later ESPKit commits. Today `main` is the `v3.2.0` tag.
+A template copy starts a new Git history. It does not receive later ESPKit commits. Today `main` is the `v3.3.0` tag.
 
 ## Make the sensor firmware yours
 

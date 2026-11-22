@@ -1,4 +1,4 @@
-version: "3.2.0"
+version: "3.3.0"
 description: "Task spec, service lifecycle, loop budget, and bounded SPSC queues"
 url: "https://xqvryn.github.io/esp-idf-template/"
 documentation: "https://xqvryn.github.io/esp-idf-template/components/runtime/"

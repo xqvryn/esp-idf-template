@@ -6,6 +6,13 @@ releases for the documentation site. It is not a second version source:
 `release.config.mjs` still chooses the tag from commit history. The GitHub
 release for a tag is the full note.
 
+## 3.3.0
+
+Released as `v3.3.0` on `main` (2026-11-22). The simulation-only quadcopter
+skeleton gained a 6-DOF host plant, mixer desaturation, tilt and IMU-age
+arming checks, a QEMU failsafe log, and a props-off pre-flight checklist. It
+is not flight-tested.
+
 ## 3.2.0
 
 Released as `v3.2.0` on `main` (2026-11-22). Reusable components gained complete
