@@ -113,9 +113,10 @@ Firmware versions are calculated before compilation and checked again before pub
 Copy it as a GitHub template when you want the build, CI, and tests in a new
 repository. Depend on individual components when an existing project should pin
 the same networking, storage, or driver sources. The template copy does not
-receive later upstream commits. The component manifests are ready to publish
-and are not uploaded to the component registry. See
-[Use the components](docs/guides/components.md).
+receive later upstream commits. Depend on a component with a git tag, or with a
+registry name after a maintainer has published it. See
+[Use the components](docs/guides/components.md) and
+[Publish components to the registry](docs/guides/component-registry.md).
 
 ## Customize
 

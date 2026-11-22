@@ -10,6 +10,9 @@ Every push and pull request runs, without secrets:
 - ESP32-S3 firmware builds for the root project, each application profile, the Unity test app, and every example
 - a QEMU boot of the minimal example, the three root profiles, and `examples/simulation` (`qemu-smoke`)
 - QEMU scenarios for commands, NVS, sensor faults, and a decoded panic (`qemu-scenarios`)
+- packing every reusable component with `compote component pack` (`component-registry`)
+
+A separate workflow runs on `v*` tags. It publishes those archives to the ESP Component Registry only on a stable tag and only when `IDF_COMPONENT_API_TOKEN` is set; otherwise it succeeds without uploading. See [Publish components to the registry](component-registry.md).
 
 The networking-only example fails CI if the node application libraries appear in its build graph.
 

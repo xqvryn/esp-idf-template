@@ -5,25 +5,25 @@ dependencies:
       version: '>=5.4'
     - name: runtime
       path: ../runtime
-      version: 3.0.0
+      version: 3.2.0
     source:
       path: ../../components/channels
       type: local
-    version: 3.0.0
+    version: 3.2.0
   flight:
     dependencies:
     - name: idf
       version: '>=5.4'
     - name: motion
       path: ../motion
-      version: 3.0.0
+      version: 3.2.0
     - name: parameters
       path: ../parameters
-      version: 3.0.0
+      version: 3.2.0
     source:
       path: ../../components/flight
       type: local
-    version: 3.0.0
+    version: 3.2.0
   idf:
     source:
       type: idf
@@ -35,7 +35,7 @@ dependencies:
     source:
       path: ../../components/motion
       type: local
-    version: 3.0.0
+    version: 3.2.0
   parameters:
     dependencies:
     - name: idf
@@ -43,7 +43,7 @@ dependencies:
     source:
       path: ../../components/parameters
       type: local
-    version: 3.0.0
+    version: 3.2.0
   runtime:
     dependencies:
     - name: idf
@@ -51,7 +51,7 @@ dependencies:
     source:
       path: ../../components/runtime
       type: local
-    version: 3.0.0
+    version: 3.2.0
 direct_dependencies:
 - channels
 - flight

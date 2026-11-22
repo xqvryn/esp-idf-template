@@ -1,9 +1,18 @@
-version: "3.0.0"
+version: "3.2.0"
 description: "Pinned FreeRTOS periodic task that records a runtime loop budget"
-url: "https://github.com/xqvryn/esp-idf-template"
+url: "https://xqvryn.github.io/esp-idf-template/"
+documentation: "https://xqvryn.github.io/esp-idf-template/components/runtime-task/"
+issues: "https://github.com/xqvryn/esp-idf-template/issues"
+repository: "https://github.com/xqvryn/esp-idf-template.git"
+repository_info:
+  path: "components/runtime_task"
 license: "MIT"
+files:
+  exclude:
+    - "test/**/*"
+    - "**/test/**/*"
 dependencies:
   idf: ">=5.4"
   runtime:
     path: "../runtime"
-    version: "3.0.0"
+    version: "3.2.0"

@@ -12,7 +12,7 @@ Delete the examples you do not need. Upstream fixes do not flow into that copy.
 
 ## From an existing ESP-IDF project
 
-Each reusable component has an `idf_component.yml` with version `3.0.0`, a description, the MIT license, and `idf: ">=5.4"`.
+Each reusable component has an `idf_component.yml` with version `3.2.0`, a description, homepage, documentation, issues, Git repository, `repository_info.path`, the MIT license, a `files` exclude list, and `idf: ">=5.4"`.
 
 | Component | Manifest | Needs |
 | --- | --- | --- |
@@ -37,16 +37,27 @@ dependencies:
   configuration:
     git: https://github.com/xqvryn/esp-idf-template.git
     path: components/configuration
-    version: v3.0.0
+    version: v3.2.0
   networking:
     git: https://github.com/xqvryn/esp-idf-template.git
     path: components/networking
-    version: v3.0.0
+    version: v3.2.0
 ```
 
-`version: v3.0.0` selects that tag. The repository is public, so this `git` dependency works without a token. `git`, `path`, and `version` select one directory inside the repository. Then `REQUIRES` or `PRIV_REQUIRES` that component from CMake.
+`version: v3.2.0` selects that release tag (use the latest stable tag). The repository is public, so this `git` dependency works without a token. `git`, `path`, and `version` select one directory inside the repository. Then `REQUIRES` or `PRIV_REQUIRES` that component from CMake.
 
-These manifests are **not** uploaded to the ESP Component Registry. Do not add a registry dependency until a maintainer publishes them.
+Once a maintainer has published to the ESP Component Registry, the same components can be pulled by name. Until that upload happens, prefer the `git` form above.
+
+```yaml
+dependencies:
+  idf: ">=5.4"
+  xqvryn/configuration:
+    version: "^3.2.0"
+  xqvryn/networking:
+    version: "^3.2.0"
+```
+
+How packaging and the optional publish job work is in [Publish components to the registry](component-registry.md).
 
 Inside this repository, examples use a local path instead of `git`:
 
@@ -56,7 +67,7 @@ dependencies:
     path: "../../../components/platform"
 ```
 
-`override_path` is the other local form. It replaces a versioned dependency with a directory while you edit. `path` is enough while the component is not in the registry.
+`override_path` is the other local form. It replaces a versioned git or registry dependency with a directory while you edit. `path` is enough for an in-tree example.
 
 `platform`, `configuration`, `networking`, `drivers`, `timed_output`, `runtime`, `parameters`, `channels`, and `runtime_task` do not compile the sensor workers. `examples/networking` is the build that checks the network side of that split. Leave `applications/node` off the path unless you want those workers. The minimal profile does not compile the runtime, parameter, or channel components.
 

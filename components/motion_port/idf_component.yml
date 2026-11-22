@@ -1,9 +1,18 @@
-version: "3.0.0"
+version: "3.2.0"
 description: "ESP-IDF bindings for motion pins that a board profile sets"
-url: "https://github.com/xqvryn/esp-idf-template"
+url: "https://xqvryn.github.io/esp-idf-template/"
+documentation: "https://xqvryn.github.io/esp-idf-template/components/motion-port/"
+issues: "https://github.com/xqvryn/esp-idf-template/issues"
+repository: "https://github.com/xqvryn/esp-idf-template.git"
+repository_info:
+  path: "components/motion_port"
 license: "MIT"
+files:
+  exclude:
+    - "test/**/*"
+    - "**/test/**/*"
 dependencies:
   idf: ">=5.4"
   motion:
     path: "../motion"
-    version: "3.0.0"
+    version: "3.2.0"
