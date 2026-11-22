@@ -1,4 +1,5 @@
 #include "flight/controller.hpp"
+#include "flight/plant.hpp"
 #include "parameters/text.hpp"
 
 #include <cmath>
@@ -145,6 +146,125 @@ TEST(FlightParameters, TextAssignmentChangesAGain) {
               parameters::ParameterWrite::rejected);
     ASSERT_TRUE(flight::load_flight_parameters(registry, gains, limits));
     EXPECT_FLOAT_EQ(gains.rate_kp, 0.1F);
+}
+
+TEST(Mixer, HighThrottlePreservesARollDifferential) {
+    flight::Motors motors;
+    flight::mix_quad_x(1.0F, 0.3F, 0, 0, motors);
+    const float left = motors.command[2] + motors.command[3];
+    const float right = motors.command[0] + motors.command[1];
+    EXPECT_NEAR(left - right, 1.2F, 0.02F);
+    for (float command : motors.command) {
+        EXPECT_GE(command, 0);
+        EXPECT_LE(command, 1);
+    }
+}
+
+TEST(Arming, RefusesATiltedAttitudeAndAFrozenImu) {
+    flight::Vehicle vehicle;
+    flight::reset_vehicle(vehicle);
+    flight::Gains gains;
+    flight::Limits limits;
+    flight::Pilot pilot;
+    pilot.arm_switch = true;
+    pilot.throttle = 0;
+    pilot.battery_v = 12.0F;
+    Body tilted;
+    tilted.roll = 1.2F;
+    flight::step_vehicle(vehicle, pilot, gains, limits, sense(tilted), 0.001F);
+    EXPECT_EQ(vehicle.arm, flight::ArmState::disarmed);
+
+    Body level;
+    motion::ImuSample first = sense(level);
+    first.time_us = 1000;
+    flight::step_vehicle(vehicle, pilot, gains, limits, first, 0.001F);
+    EXPECT_EQ(vehicle.arm, flight::ArmState::armed);
+
+    motion::ImuSample frozen = first;
+    frozen.time_us = 1000;
+    pilot.throttle = 0.45F;
+    flight::step_vehicle(vehicle, pilot, gains, limits, frozen, 0.001F);
+    EXPECT_EQ(vehicle.arm, flight::ArmState::failsafe);
+    for (float command : vehicle.motors.command) {
+        EXPECT_FLOAT_EQ(command, 0);
+    }
+
+    flight::reset_vehicle(vehicle);
+    pilot.throttle = 0;
+    motion::ImuSample late = sense(level);
+    late.time_us = 2000;
+    flight::step_vehicle(vehicle, pilot, gains, limits, late, 0.001F);
+    EXPECT_EQ(vehicle.arm, flight::ArmState::armed);
+    late.time_us = 2000 + 100000;
+    flight::step_vehicle(vehicle, pilot, gains, limits, late, 0.001F);
+    EXPECT_EQ(vehicle.arm, flight::ArmState::failsafe);
+
+    flight::reset_vehicle(vehicle);
+    motion::ImuSample invalid = sense(level);
+    invalid.valid = false;
+    invalid.time_us = 1000;
+    flight::step_vehicle(vehicle, pilot, gains, limits, invalid, 0.001F);
+    EXPECT_EQ(vehicle.arm, flight::ArmState::failsafe);
+    EXPECT_FLOAT_EQ(vehicle.motors.command[0], 0);
+}
+
+TEST(Plant, LevelRestMeasuresGravityOnZ) {
+    flight::PlantConfig config;
+    flight::PlantState state;
+    flight::reset_plant(state, config);
+    flight::Motors motors;
+    for (float& command : motors.command) {
+        command = config.hover_command;
+        // Spool the lag so this sample is a hover, not free fall.
+    }
+    for (float& rotor : state.rotor) {
+        rotor = config.hover_command;
+    }
+    flight::Wind wind;
+    flight::step_plant(state, motors, wind, config, 0.001F);
+    motion::ImuSample sample = flight::sense_plant(state, config);
+    EXPECT_NEAR(sample.accel_m_s2[0], 0, 0.2F);
+    EXPECT_NEAR(sample.accel_m_s2[1], 0, 0.2F);
+    EXPECT_NEAR(sample.accel_m_s2[2], config.gravity, 0.3F);
+    EXPECT_TRUE(sample.valid);
+}
+
+TEST(Plant, ClosedLoopLevelsThroughLagNoiseAndAGust) {
+    flight::Vehicle vehicle;
+    flight::reset_vehicle(vehicle);
+    flight::Gains gains;
+    flight::Limits limits;
+    flight::PlantConfig config;
+    config.motor_tau_s = 0.02F;
+    config.gyro_noise_rad_s = 0.01F;
+    config.accel_noise_m_s2 = 0.05F;
+    config.seed = 7;
+    flight::PlantState state;
+    flight::reset_plant(state, config);
+    flight::Wind wind;
+    flight::Pilot pilot;
+    pilot.arm_switch = true;
+    pilot.throttle = 0;
+    pilot.battery_v = 12.0F;
+    flight::step_vehicle(vehicle, pilot, gains, limits, flight::sense_plant(state, config), 0.001F);
+    ASSERT_EQ(vehicle.arm, flight::ArmState::armed);
+    state.roll = 0.3F;
+    pilot.throttle = config.hover_command;
+    for (int step = 0; step < 8000; ++step) {
+        if (step == 2000) {
+            wind.world_m_s[1] = 4.0F;
+        }
+        if (step == 2400) {
+            wind.world_m_s[1] = 0;
+        }
+        motion::ImuSample sample = flight::sense_plant(state, config);
+        flight::step_vehicle(vehicle, pilot, gains, limits, sample, 0.001F);
+        flight::step_plant(state, vehicle.motors, wind, config, 0.001F);
+    }
+    EXPECT_EQ(vehicle.arm, flight::ArmState::armed);
+    EXPECT_LT(std::fabs(state.roll), 0.12F);
+    EXPECT_LT(std::fabs(state.pitch), 0.12F);
+    EXPECT_LT(std::fabs(state.roll_rate), 0.5F);
 }
 
 } // namespace

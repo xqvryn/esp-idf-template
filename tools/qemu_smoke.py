@@ -68,7 +68,14 @@ CASES = (
     Case(
         "example-drone",
         "examples/drone",
-        ("simulation only: arm=0 motor_sum=0.00", "pins=simulated"),
+        (
+            "simulation only: arm=0 motor_sum=0.00",
+            "pins=simulated",
+            "arm denied throttle: arm=0 motor_sum=0.00",
+            "arm denied tilt: arm=0 motor_sum=0.00",
+            "failsafe rc_lost motor_sum=0.00",
+            "failsafe imu motor_sum=0.00",
+        ),
     ),
 )
 

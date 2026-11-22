@@ -1,6 +1,7 @@
 #include "flight/controller.hpp"
 
 #include <cmath>
+#include <cstdint>
 
 namespace flight {
 
@@ -49,12 +50,38 @@ float finite_or_zero(float value) noexcept {
 } // namespace
 
 void mix_quad_x(float throttle, float roll, float pitch, float yaw, Motors& motors) noexcept {
-    const float raw[4] = {
+    float raw[4] = {
         throttle - roll + pitch - yaw,
         throttle - roll - pitch + yaw,
         throttle + roll - pitch - yaw,
         throttle + roll + pitch + yaw,
     };
+    float lo = raw[0];
+    float hi = raw[0];
+    for (int index = 1; index < 4; ++index) {
+        if (raw[index] < lo) {
+            lo = raw[index];
+        }
+        if (raw[index] > hi) {
+            hi = raw[index];
+        }
+    }
+    const float span = hi - lo;
+    if (span > 1.0F) {
+        const float mid = 0.5F * (hi + lo);
+        const float scale = 1.0F / span;
+        for (float& command : raw) {
+            command = 0.5F + ((command - mid) * scale);
+        }
+    } else if (hi > 1.0F) {
+        for (float& command : raw) {
+            command -= hi - 1.0F;
+        }
+    } else if (lo < 0.0F) {
+        for (float& command : raw) {
+            command -= lo;
+        }
+    }
     for (int index = 0; index < 4; ++index) {
         float command = raw[index];
         if (command < 0) {
@@ -105,6 +132,21 @@ void step_vehicle(Vehicle& vehicle, const Pilot& pilot, const Gains& gains, cons
         reset_loops(vehicle);
         return;
     }
+    if (imu.time_us != 0 && vehicle.last_imu_time_us != 0) {
+        const std::int64_t delta_us = imu.time_us - vehicle.last_imu_time_us;
+        const std::int64_t max_age_us =
+            limits.imu_max_age_s > 0
+                ? static_cast<std::int64_t>(limits.imu_max_age_s * 1'000'000.0F)
+                : 0;
+        if (delta_us <= 0 || (max_age_us > 0 && delta_us > max_age_us)) {
+            vehicle.arm = ArmState::failsafe;
+            reset_loops(vehicle);
+            return;
+        }
+    }
+    if (imu.time_us != 0) {
+        vehicle.last_imu_time_us = imu.time_us;
+    }
 
     const float roll_accel =
         std::atan2(finite_or_zero(imu.accel_m_s2[1]), finite_or_zero(imu.accel_m_s2[2]));
@@ -142,8 +184,13 @@ void step_vehicle(Vehicle& vehicle, const Pilot& pilot, const Gains& gains, cons
     if (vehicle.arm == ArmState::failsafe) {
         vehicle.arm = ArmState::disarmed;
     }
+    const float accel_x = finite_or_zero(imu.accel_m_s2[0]);
+    const float accel_y = finite_or_zero(imu.accel_m_s2[1]);
+    const float accel_z = finite_or_zero(imu.accel_m_s2[2]);
+    const float tilt = std::atan2(std::sqrt((accel_x * accel_x) + (accel_y * accel_y)), accel_z);
+    const bool level_enough = tilt <= limits.max_arm_tilt_rad;
     if (vehicle.arm == ArmState::disarmed && pilot.arm_switch && vehicle.arm_switch_released &&
-        pilot.throttle <= limits.throttle_arm_max) {
+        pilot.throttle <= limits.throttle_arm_max && level_enough) {
         vehicle.arm = ArmState::armed;
         vehicle.arm_switch_released = false;
         reset_loops(vehicle);

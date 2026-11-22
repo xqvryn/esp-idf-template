@@ -90,6 +90,7 @@ nav:
   - Guides:
       - Build profiles: guides/profiles.md
       - Building a drone: guides/building-a-drone.md
+      - Pre-flight checklist: guides/pre-flight-checklist.md
       - Use the components: guides/components.md
       - Publish components to the registry: guides/component-registry.md
       - Board porting: board-porting.md

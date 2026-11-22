@@ -1,4 +1,4 @@
-version: "3.2.0"
+version: "3.3.0"
 description: "Bounded structured log records and a latest telemetry sample"
 url: "https://xqvryn.github.io/esp-idf-template/"
 documentation: "https://xqvryn.github.io/esp-idf-template/components/channels/"
@@ -15,4 +15,4 @@ dependencies:
   idf: ">=5.4"
   runtime:
     path: "../runtime"
-    version: "3.2.0"
+    version: "3.3.0"
