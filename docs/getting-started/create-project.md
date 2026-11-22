@@ -1,9 +1,12 @@
 # Create a project
 
 ```sh
-gh repo create my-app --template xqvryn/esp-idf-template --private --clone
+gh repo create my-app --template xqvryn/esp-idf-template --private --include-all-branches --clone
 cd my-app
+git checkout main
 ```
+
+`gh repo create --template` and **Use this template** copy only the template default branch unless every branch is included. This repository's default branch is `develop`. `--include-all-branches` is how a product copy also gets `main`. To contribute a change back to ESPKit, work from `develop`.
 
 The full first build is [Getting started](index.md). In short:
 
@@ -12,7 +15,7 @@ The full first build is [Getting started](index.md). In short:
 3. Rename the root CMake project if you do not want the name `device`.
 4. Choose a [profile](../guides/profiles.md) only when you are building the root firmware.
 
-A template copy starts a new Git history. It does not receive upstream ESPKit commits. Use `develop` for contributions to ESPKit itself. A new product can start from `main` after you review that branch. Today `main` is the `v2.0.0` tag. `develop` has later work that is not tagged yet.
+A template copy starts a new Git history. It does not receive later ESPKit commits. Today `main` is the `v3.2.0` tag.
 
 ## Make the sensor firmware yours
 
