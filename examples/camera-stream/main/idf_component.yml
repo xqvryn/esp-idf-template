@@ -1,0 +1,8 @@
+dependencies:
+  idf: "==5.4.2"
+  configuration:
+    path: "../../../components/configuration"
+  networking:
+    path: "../../../components/networking"
+  espressif/esp32-camera:
+    version: "~2.1.9"
