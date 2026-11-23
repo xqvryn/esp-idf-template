@@ -24,8 +24,9 @@ set(component_paths
     channels "${repo_root}/components/channels"
     motion "${repo_root}/components/motion"
     flight "${repo_root}/components/flight"
-    ota "${repo_root}/components/ota")
-foreach(component timed_output domain application node_drivers drivers configuration networking runtime parameters channels motion flight ota)
+    ota "${repo_root}/components/ota"
+    image_motion "${repo_root}/components/image_motion")
+foreach(component timed_output domain application node_drivers drivers configuration networking runtime parameters channels motion flight ota image_motion)
     list(FIND component_paths ${component} index)
     math(EXPR path_index "${index} + 1")
     list(GET component_paths ${path_index} component_dir)
@@ -48,8 +49,9 @@ add_executable(policy_tests
     test_channels.cpp
     test_motion.cpp
     test_flight.cpp
-    test_ota.cpp)
+    test_ota.cpp
+    test_image_motion.cpp)
 target_compile_options(policy_tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
-target_link_libraries(policy_tests PRIVATE GTest::gtest_main domain application node_drivers drivers configuration networking timed_output runtime parameters channels motion flight ota)
+target_link_libraries(policy_tests PRIVATE GTest::gtest_main domain application node_drivers drivers configuration networking timed_output runtime parameters channels motion flight ota image_motion)
 include(GoogleTest)
 gtest_discover_tests(policy_tests)

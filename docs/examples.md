@@ -22,8 +22,9 @@ CI compiles every example for `esp32s3`. Compilation does not flash a board.
 | [Wi-Fi check](examples/wifi-check.md) | Associates the station, logs IP/RSSI/channel, optional SNTP. Hardware only |
 | [Camera stream](examples/camera-stream.md) | HTTP MJPEG preview and still capture on the same board. Hardware only |
 | [OTA update](examples/ota-update.md) | HTTP firmware upload and rollback on the same board. Hardware only |
+| [Camera timelapse](examples/camera-timelapse.md) | Scheduled stills and motion-triggered captures on the same board. Hardware only |
 
-The board LED, camera, Wi-Fi check, camera stream, and OTA update examples target an ESP32-S3-WROOM CAM / Freenove-style board (16 MB flash, 8 MB octal PSRAM, WS2812 on GPIO 48). CI compiles them but does not boot them under QEMU.
+The board LED, camera, Wi-Fi check, camera stream, OTA update, and camera timelapse examples target an ESP32-S3-WROOM CAM / Freenove-style board (16 MB flash, 8 MB octal PSRAM, WS2812 on GPIO 48). CI compiles them but does not boot them under QEMU.
 
 ## Sensor node
 

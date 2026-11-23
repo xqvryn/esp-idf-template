@@ -109,6 +109,7 @@ nav:
       - Drivers: components/drivers.md
       - Timed output: components/timed-output.md
       - OTA: components/ota.md
+      - Image motion: components/image-motion.md
       - Runtime: components/runtime.md
       - Parameters: components/parameters.md
       - Channels: components/channels.md
@@ -128,6 +129,7 @@ nav:
       - Wi-Fi check: examples/wifi-check.md
       - Camera stream: examples/camera-stream.md
       - OTA update: examples/ota-update.md
+      - Camera timelapse: examples/camera-timelapse.md
   - Decisions:
       - Portable control: decisions/0001-portable-control-and-simulation.md
       - Injected workers: decisions/0002-injected-workers-and-composition.md

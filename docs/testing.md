@@ -41,11 +41,14 @@ stick step, and force zero motors on RC loss, low battery, and the kill switch.
 Those tests do not open NVS, start FreeRTOS, or program a GPIO.
 OTA tests confirm a pending image only after Wi-Fi is up and a self-check
 passed, refuse a failed check or a missing association, and accept a valid
-ESP-IDF application image prefix.
+ESP-IDF application image prefix. Image motion tests compare grayscale
+frames: identical and below-threshold noise stay quiet, a moved block
+triggers, a uniform brightness shift is compensated, and a second trigger
+inside the cooldown is suppressed.
 
 ## QEMU
 
-`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, `examples/simulation`, and `examples/drone`. The board LED, camera, Wi-Fi check, camera stream, and OTA update examples are compiled in CI but not booted under QEMU, because they need the real LED, camera, or Wi-Fi radio. `python3 tests/qemu/run.py` drives commands, NVS, sensor faults, and a decoded panic on the sensor firmware. Wi-Fi, MQTT, and GPIO stay on a board. See [Testing with QEMU](guides/qemu.md).
+`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, `examples/simulation`, and `examples/drone`. The board LED, camera, Wi-Fi check, camera stream, OTA update, and camera timelapse examples are compiled in CI but not booted under QEMU, because they need the real LED, camera, or Wi-Fi radio. `python3 tests/qemu/run.py` drives commands, NVS, sensor faults, and a decoded panic on the sensor firmware. Wi-Fi, MQTT, and GPIO stay on a board. See [Testing with QEMU](guides/qemu.md).
 
 ## Target
 
