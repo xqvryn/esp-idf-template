@@ -96,6 +96,8 @@ bool WifiStation::release_owned() noexcept {
     wifi_started_.store(false);
     wifi_up_.store(false);
     connecting_.store(false);
+    last_disconnect_reason_.store(0);
+    disconnect_count_.store(0);
     backoff_.reset();
     next_attempt_ = 0;
     connect_started_ = 0;
@@ -214,7 +216,7 @@ void WifiStation::stop() noexcept {
 #endif
 }
 
-void WifiStation::event(void* context, esp_event_base_t base, std::int32_t id, void*) {
+void WifiStation::event(void* context, esp_event_base_t base, std::int32_t id, void* data) {
     auto& self = *static_cast<WifiStation*>(context);
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
         self.wifi_started_.store(true);
@@ -222,6 +224,11 @@ void WifiStation::event(void* context, esp_event_base_t base, std::int32_t id, v
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
         self.wifi_up_.store(false);
         self.connecting_.store(false);
+        if (data != nullptr) {
+            const auto* event = static_cast<const wifi_event_sta_disconnected_t*>(data);
+            self.last_disconnect_reason_.store(event->reason);
+            self.disconnect_count_.fetch_add(1);
+        }
     }
     if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         self.wifi_up_.store(true);

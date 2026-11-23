@@ -30,6 +30,15 @@ class WifiStation final : public WifiConnection {
         return wifi_up_.load();
     }
 
+    // 0 until the first WIFI_EVENT_STA_DISCONNECTED. Not part of WifiConnection.
+    std::uint8_t last_disconnect_reason() const noexcept {
+        return last_disconnect_reason_.load();
+    }
+
+    std::uint32_t disconnect_count() const noexcept {
+        return disconnect_count_.load();
+    }
+
     private:
     bool ensure_process() noexcept;
     bool advance(WifiPhase next) noexcept;
@@ -50,6 +59,8 @@ class WifiStation final : public WifiConnection {
     esp_event_handler_instance_t ip_handler_{nullptr};
     std::int64_t next_attempt_{0};
     std::int64_t connect_started_{0};
+    std::atomic<std::uint8_t> last_disconnect_reason_{0};
+    std::atomic<std::uint32_t> disconnect_count_{0};
 };
 
 } // namespace networking

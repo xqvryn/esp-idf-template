@@ -19,8 +19,9 @@ CI compiles every example for `esp32s3`. Compilation does not flash a board.
 | [Drone](guides/building-a-drone.md) | Quadcopter skeleton. Simulation-verified only, disarmed at boot |
 | [Board LED](examples/board-led.md) | Cycles the onboard WS2812 on GPIO 48. Hardware only |
 | [Camera](examples/camera.md) | Detects the OV-series sensor and captures JPEG frames. Hardware only |
+| [Wi-Fi check](examples/wifi-check.md) | Associates the station, logs IP/RSSI/channel, optional SNTP. Hardware only |
 
-The board LED and camera examples target an ESP32-S3-WROOM CAM / Freenove-style board (16 MB flash, 8 MB octal PSRAM, WS2812 on GPIO 48). CI compiles them but does not boot them under QEMU.
+The board LED, camera, and Wi-Fi check examples target an ESP32-S3-WROOM CAM / Freenove-style board (16 MB flash, 8 MB octal PSRAM, WS2812 on GPIO 48). CI compiles them but does not boot them under QEMU.
 
 ## Sensor node
 

@@ -72,4 +72,42 @@ bool NvsConfigStore::load(NetworkConfig& config, bool allow_plaintext) const noe
     return true;
 }
 
+bool NvsConfigStore::load_wifi(NetworkConfig& config) const noexcept {
+    if (nvs_flash_init() != ESP_OK) {
+        return false;
+    }
+    nvs_handle_t handle = 0;
+    if (nvs_open(nvs_namespace, NVS_READONLY, &handle) != ESP_OK) {
+        return false;
+    }
+    NetworkConfig loaded{};
+    const auto ssid = read_string(handle, "wifi_ssid", loaded.wifi_ssid);
+    const auto password = read_string(handle, "wifi_pass", loaded.wifi_password);
+    nvs_close(handle);
+    if (ssid != StoredKey::present || loaded.wifi_ssid[0] == '\0') {
+        return false;
+    }
+    if (password == StoredKey::corrupt) {
+        return false;
+    }
+    std::memcpy(config.wifi_ssid, loaded.wifi_ssid, sizeof(config.wifi_ssid));
+    std::memcpy(config.wifi_password, loaded.wifi_password, sizeof(config.wifi_password));
+    return true;
+}
+
+bool NvsConfigStore::save_wifi(const NetworkConfig& config) const noexcept {
+    if (nvs_flash_init() != ESP_OK) {
+        return false;
+    }
+    nvs_handle_t handle = 0;
+    if (nvs_open(nvs_namespace, NVS_READWRITE, &handle) != ESP_OK) {
+        return false;
+    }
+    const auto ssid = nvs_set_str(handle, "wifi_ssid", config.wifi_ssid);
+    const auto password = nvs_set_str(handle, "wifi_pass", config.wifi_password);
+    const auto committed = (ssid == ESP_OK && password == ESP_OK) ? nvs_commit(handle) : ssid;
+    nvs_close(handle);
+    return committed == ESP_OK && password == ESP_OK;
+}
+
 } // namespace configuration

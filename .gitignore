@@ -1,6 +1,8 @@
 build*/
 sdkconfig
 sdkconfig.old
+sdkconfig.local
+sdkconfig.defaults.local
 managed_components/
 .env
 .env.*
