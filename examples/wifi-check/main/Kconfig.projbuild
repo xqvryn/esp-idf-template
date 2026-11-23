@@ -1,0 +1,29 @@
+menu "ESPKit Wi-Fi check"
+
+    config ESPKIT_WIFI_CHECK_SSID
+        string "Wi-Fi SSID"
+        default ""
+        help
+            Leave empty in the committed defaults. Put the SSID in an untracked
+            sdkconfig.defaults.local or sdkconfig.local (see the example README)
+            or provision it into the espkit NVS namespace.
+
+    config ESPKIT_WIFI_CHECK_PASSWORD
+        string "Wi-Fi password"
+        default ""
+        help
+            WPA2-PSK password. Never commit this value. It is not logged.
+
+    config ESPKIT_WIFI_CHECK_SAVE_TO_NVS
+        bool "Save Kconfig credentials into the espkit NVS namespace after a successful connect"
+        default n
+        help
+            Writes only wifi_ssid and wifi_pass. Schema, MQTT, and identity
+            keys are left unchanged. Off by default so CI and first flashes
+            do not write flash.
+
+    config ESPKIT_WIFI_CHECK_SNTP
+        bool "Synchronize time with SNTP after the station is up"
+        default y
+
+endmenu

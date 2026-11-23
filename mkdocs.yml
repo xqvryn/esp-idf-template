@@ -122,6 +122,9 @@ nav:
       - Sensor node: examples/sensor-node.md
       - Actuator node: examples/actuator-node.md
       - Simulation: examples/simulation.md
+      - Board LED: examples/board-led.md
+      - Camera: examples/camera.md
+      - Wi-Fi check: examples/wifi-check.md
   - Decisions:
       - Portable control: decisions/0001-portable-control-and-simulation.md
       - Injected workers: decisions/0002-injected-workers-and-composition.md
