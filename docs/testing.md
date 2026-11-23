@@ -39,10 +39,13 @@ pulse clamping, a DShot frame, SBUS failsafe, and PPM sync. Flight tests arm a
 quad only with low throttle, return a tilted rigid body toward level, track a
 stick step, and force zero motors on RC loss, low battery, and the kill switch.
 Those tests do not open NVS, start FreeRTOS, or program a GPIO.
+OTA tests confirm a pending image only after Wi-Fi is up and a self-check
+passed, refuse a failed check or a missing association, and accept a valid
+ESP-IDF application image prefix.
 
 ## QEMU
 
-`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, `examples/simulation`, and `examples/drone`. The board LED, camera, Wi-Fi check, and camera stream examples are compiled in CI but not booted under QEMU, because they need the real LED, camera, or Wi-Fi radio. `python3 tests/qemu/run.py` drives commands, NVS, sensor faults, and a decoded panic on the sensor firmware. Wi-Fi, MQTT, and GPIO stay on a board. See [Testing with QEMU](guides/qemu.md).
+`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, `examples/simulation`, and `examples/drone`. The board LED, camera, Wi-Fi check, camera stream, and OTA update examples are compiled in CI but not booted under QEMU, because they need the real LED, camera, or Wi-Fi radio. `python3 tests/qemu/run.py` drives commands, NVS, sensor faults, and a decoded panic on the sensor firmware. Wi-Fi, MQTT, and GPIO stay on a board. See [Testing with QEMU](guides/qemu.md).
 
 ## Target
 

@@ -9,6 +9,7 @@ These components are optional. A project compiles one only when it `REQUIRES` it
 | [networking](networking.md) | Wi-Fi station, SNTP, MQTT client, and the link state machine |
 | [drivers](drivers.md) | SHT3x temperature and humidity samples |
 | [timed_output](timed-output.md) | Off / running / fault policy with a maximum run and sample age |
+| [ota](ota.md) | Boot confirmation and ESP-IDF application image prefix checks |
 | [runtime](runtime.md) | Task spec, service lifecycle, loop budget, SPSC queue, latest mailbox |
 | [parameters](parameters.md) | Typed parameters, text assignment, and a separate NVS blob |
 | [channels](channels.md) | Structured records and a latest telemetry sample |

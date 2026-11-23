@@ -17,13 +17,13 @@ Implemented:
 - Optional SHT3x-DIS I2C driver and Wi-Fi/MQTT status reporting with versioned NVS settings.
 - ESP32-S3 build workflow and host test workflow.
 - Unity target-test application (execution requires hardware).
-- A 4 MiB flash layout reserving two OTA application slots.
+- A 4 MiB flash layout reserving two OTA application slots, plus an HTTP OTA example with rollback.
 - MkDocs documentation, tutorials, and standalone simulation/sensor/actuator examples.
 - Same-run firmware bundles with checksums and source manifests.
 - Opt-in GitHub Pages deployment and semantic-release on validated main pushes.
 
 Planned: physical actuator drivers, MQTT command subscription, secure provisioning,
-OTA execution, hardware acceptance tests, and smart-farm automation.
+product-firmware OTA wiring, hardware acceptance tests, and smart-farm automation.
 These features are not implemented by placeholder folders.
 
 **Do not connect this starter firmware to a live pump.** Hardware output control
@@ -97,11 +97,11 @@ mkdocs serve
 
 Standalone projects live in `examples/minimal`, `examples/simulation`,
 `examples/sensor-node`, `examples/actuator-node`, `examples/board-led`,
-`examples/camera`, `examples/wifi-check`, and `examples/camera-stream`. Each
-has its own README and is compiled in CI. `examples/minimal` does not use
-the sensor/actuator components. The board LED, camera, Wi-Fi check, and
-camera stream examples are hardware bring-up programs; QEMU does not boot
-them.
+`examples/camera`, `examples/wifi-check`, `examples/camera-stream`, and
+`examples/ota-update`. Each has its own README and is compiled in CI.
+`examples/minimal` does not use the sensor/actuator components. The board
+LED, camera, Wi-Fi check, camera stream, and OTA update examples are
+hardware bring-up programs; QEMU does not boot them.
 
 Development flows through `feature/* -> develop -> main`. Keep main as the stable
 template default. CI builds and tests without secrets. Set `ENABLE_PAGES=true` and/or
