@@ -662,7 +662,11 @@ bool start_httpd() {
 }
 
 void confirm_or_rollback(bool wifi_connected) {
-    const bool fail_requested = CONFIG_ESPKIT_OTA_UPDATE_FAIL_SELF_CHECK;
+#if CONFIG_ESPKIT_OTA_UPDATE_FAIL_SELF_CHECK
+    const bool fail_requested = true;
+#else
+    const bool fail_requested = false;
+#endif
     ota::BootConfirmInput input{};
     input.running_state = running_image_state;
     input.wifi_connected = wifi_connected;
