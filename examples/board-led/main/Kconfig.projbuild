@@ -1,0 +1,19 @@
+menu "ESPKit board LED"
+
+    config ESPKIT_BOARD_LED_GPIO
+        int "Onboard WS2812 GPIO"
+        default 48
+        range 0 48
+        help
+            Data pin for the onboard WS2812 RGB LED. GPIO 48 is the usual pin
+            on ESP32-S3-WROOM CAM / Freenove-style boards and on Espressif's
+            official ESP32-S3 DevKits.
+
+    config ESPKIT_BOARD_LED_COUNT
+        int "WS2812 LED count"
+        default 1
+        range 1 16
+        help
+            Number of WS2812 LEDs on the strip. The onboard LED is one pixel.
+
+endmenu

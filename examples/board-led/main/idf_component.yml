@@ -1,0 +1,5 @@
+dependencies:
+  idf: "==5.4.2"
+  # 3.1.x needs ESP-IDF 5.5 APIs. Stay on 3.0.x for this repository's 5.4.2 baseline.
+  espressif/led_strip:
+    version: "~3.0.3"

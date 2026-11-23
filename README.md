@@ -96,9 +96,10 @@ mkdocs serve
 ```
 
 Standalone projects live in `examples/minimal`, `examples/simulation`,
-`examples/sensor-node`, and `examples/actuator-node`. Each has its own README
-and is compiled in CI. `examples/minimal` does not use the sensor/actuator
-components.
+`examples/sensor-node`, `examples/actuator-node`, `examples/board-led`, and
+`examples/camera`. Each has its own README and is compiled in CI.
+`examples/minimal` does not use the sensor/actuator components. The board LED
+and camera examples are hardware bring-up programs; QEMU does not boot them.
 
 Development flows through `feature/* -> develop -> main`. Keep main as the stable
 template default. CI builds and tests without secrets. Set `ENABLE_PAGES=true` and/or

@@ -42,7 +42,7 @@ Those tests do not open NVS, start FreeRTOS, or program a GPIO.
 
 ## QEMU
 
-`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, and `examples/simulation`. `python3 tests/qemu/run.py` drives commands, NVS, sensor faults, and a decoded panic on the sensor firmware. Wi-Fi, MQTT, and GPIO stay on a board. See [Testing with QEMU](guides/qemu.md).
+`python3 tools/qemu_smoke.py` boots the minimal images, the three root profiles, `examples/simulation`, and `examples/drone`. The board LED and camera examples are compiled in CI but not booted under QEMU, because they need the real LED and camera. `python3 tests/qemu/run.py` drives commands, NVS, sensor faults, and a decoded panic on the sensor firmware. Wi-Fi, MQTT, and GPIO stay on a board. See [Testing with QEMU](guides/qemu.md).
 
 ## Target
 
