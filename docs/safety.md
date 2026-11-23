@@ -43,7 +43,10 @@ A failed OFF stays unknown. The helper does not call network `stop` or
 `esp_ota_*`. An overwritten stop in the one-slot mailbox stays `accepted` and
 has no completion record; `accepted` is not a safe output. See
 [ADR 0008](decisions/0008-output-quiesce.md). The helper is not called on boot.
-The partition layout only reserves storage. `decide_boot_health` holds,
-confirms, or refuses from a completed control step and an applied output of
-off, and it ignores broker reachability. Download, image checks, and marking a
-slot valid are not present.
+The partition layout reserves two application slots. `examples/ota-update`
+writes the next slot, confirms a pending image with
+`esp_ota_mark_app_valid_cancel_rollback` after Wi-Fi and a self-check, and
+rolls back otherwise. `decide_boot_health` still holds, confirms, or refuses
+from a completed control step and an applied output of off, and it ignores
+broker reachability. It does not download an image or call the OTA API. The
+node `OutputQuiesce` helper is not wired to that example path.

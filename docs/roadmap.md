@@ -42,12 +42,12 @@ credentials.
 
 ## OTA and fleet operation
 
-Add HTTPS OTA, image verification, board/version compatibility checks, and local
-health confirmation/rollback. Portable output quiesce confirmation is in place
-([ADR 0008](decisions/0008-output-quiesce.md)); it is not wired to a download or
-a reboot. Do not require broker availability to mark a healthy device valid. The
-current partition table reserves two app slots; it does not implement updates.
-Budget image size against each slot.
+HTTPS OTA, image prefix checks, and local confirmation/rollback are demonstrated
+in `examples/ota-update` on the existing two-slot table. Portable output quiesce
+confirmation is in place ([ADR 0008](decisions/0008-output-quiesce.md)); it is
+not wired to a download or a reboot. Do not require broker availability to mark
+a healthy device valid. Budget image size against each slot. Board/version
+compatibility checks and product-firmware wiring remain.
 
 `decide_boot_health` is the local confirmation rule for that check. It returns
 `hold` until control has completed a step, `confirm` when that step observed

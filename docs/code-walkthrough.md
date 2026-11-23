@@ -142,7 +142,7 @@ reports are dropped; reconnection does not replay old measurements. Sensor and
 control tasks do not call this code. Stopping the network does not turn an
 output off. Before a disruptive restart, `OutputQuiesce` has to observe `off`.
 `unknown` means OFF failed and is not a safe state. The helper does not reboot
-and does not stop the network. OTA download is not implemented.
+and does not stop the network. HTTP OTA with rollback lives in `examples/ota-update`, not in this root path.
 
 Real board timing, live broker outages, and physical safety still require the
 [hardware acceptance checks](hardware-mqtt.md). Host tests cover the transitions.

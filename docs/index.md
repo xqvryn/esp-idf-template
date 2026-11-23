@@ -64,4 +64,4 @@ The default root firmware is a **sensor** profile. It samples a synthetic readin
 | See how profiles differ from the chip and the board | [Three axes](concepts/axes.md) |
 | Depend on networking without the sensor workers | [Networking example](examples/networking.md) |
 
-Status is **pre-alpha**. Host tests and ESP32-S3 builds run in CI. Live Wi-Fi, broker, and board acceptance tests are still pending. OTA download, MQTT command subscription, and physical actuator drivers are not implemented.
+Status is **pre-alpha**. Host tests and ESP32-S3 builds run in CI. Live Wi-Fi, broker, and board acceptance tests are still pending. An HTTP OTA example with rollback lives in `examples/ota-update`. MQTT command subscription and physical actuator drivers are not implemented.

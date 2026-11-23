@@ -1,0 +1,15 @@
+version: "3.3.0"
+description: "Portable OTA boot confirmation and ESP-IDF application image prefix checks"
+url: "https://xqvryn.github.io/esp-idf-template/"
+documentation: "https://xqvryn.github.io/esp-idf-template/components/ota/"
+issues: "https://github.com/xqvryn/esp-idf-template/issues"
+repository: "https://github.com/xqvryn/esp-idf-template.git"
+repository_info:
+  path: "components/ota"
+license: "MIT"
+files:
+  exclude:
+    - "test/**/*"
+    - "**/test/**/*"
+dependencies:
+  idf: ">=5.4"

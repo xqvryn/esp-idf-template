@@ -1,0 +1,56 @@
+menu "ESPKit OTA update"
+
+    config ESPKIT_OTA_UPDATE_SSID
+        string "Wi-Fi SSID"
+        default ""
+        help
+            Leave empty in the committed defaults. Put the SSID in an untracked
+            sdkconfig.defaults.local or sdkconfig.local, or provision it into
+            the espkit NVS namespace.
+
+    config ESPKIT_OTA_UPDATE_PASSWORD
+        string "Wi-Fi password"
+        default ""
+        help
+            WPA2-PSK password. Never commit this value. It is not logged.
+
+    config ESPKIT_OTA_UPDATE_LED_GPIO
+        int "Onboard WS2812 GPIO"
+        default 48
+        range 0 48
+        help
+            Data pin for the onboard WS2812 RGB LED. GPIO 48 is the usual pin
+            on ESP32-S3-WROOM CAM / Freenove-style boards.
+
+    config ESPKIT_OTA_UPDATE_LED_COUNT
+        int "WS2812 LED count"
+        default 1
+        range 1 16
+
+    config ESPKIT_OTA_UPDATE_ALLOW_HTTP
+        bool "Allow plaintext HTTP firmware pull (LAN testing only)"
+        default n
+        select ESP_HTTPS_OTA_ALLOW_HTTP
+        help
+            HTTPS pulls are the default. Enable this only on a trusted LAN
+            when you need to pull an image from an http:// URL. Uploading a
+            file to POST /update does not use this option.
+
+    config ESPKIT_OTA_UPDATE_FAIL_SELF_CHECK
+        bool "Fail the post-boot self-check (rollback test image)"
+        default n
+        help
+            For a rollback test, build one image with this option enabled,
+            update to it, and confirm the board reverts to the previous slot
+            after the grace period. Leave it off for normal images.
+
+    config ESPKIT_OTA_UPDATE_REFUSE_GRACE_S
+        int "Seconds to keep a refused image reachable before rollback"
+        default 8
+        range 0 30
+        help
+            After a failed self-check the HTTP status page stays up this long
+            so you can see the new version before the board reboots into the
+            previous slot.
+
+endmenu
