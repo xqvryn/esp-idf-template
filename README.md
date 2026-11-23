@@ -97,11 +97,12 @@ mkdocs serve
 
 Standalone projects live in `examples/minimal`, `examples/simulation`,
 `examples/sensor-node`, `examples/actuator-node`, `examples/board-led`,
-`examples/camera`, `examples/wifi-check`, `examples/camera-stream`, and
-`examples/ota-update`. Each has its own README and is compiled in CI.
-`examples/minimal` does not use the sensor/actuator components. The board
-LED, camera, Wi-Fi check, camera stream, and OTA update examples are
-hardware bring-up programs; QEMU does not boot them.
+`examples/camera`, `examples/wifi-check`, `examples/camera-stream`,
+`examples/ota-update`, and `examples/camera-timelapse`. Each has its own
+README and is compiled in CI. `examples/minimal` does not use the
+sensor/actuator components. The board LED, camera, Wi-Fi check, camera
+stream, OTA update, and camera timelapse examples are hardware bring-up
+programs; QEMU does not boot them.
 
 Development flows through `feature/* -> develop -> main`. Keep main as the stable
 template default. CI builds and tests without secrets. Set `ENABLE_PAGES=true` and/or

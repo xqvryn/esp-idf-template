@@ -1,0 +1,15 @@
+dependencies:
+  idf: "==5.4.2"
+  configuration:
+    path: "../../../components/configuration"
+  networking:
+    path: "../../../components/networking"
+  ota:
+    path: "../../../components/ota"
+  image_motion:
+    path: "../../../components/image_motion"
+  espressif/esp32-camera:
+    version: "~2.1.9"
+  # 3.1.x needs ESP-IDF 5.5 APIs. Stay on 3.0.x for this repository's 5.4.2 baseline.
+  espressif/led_strip:
+    version: "~3.0.3"

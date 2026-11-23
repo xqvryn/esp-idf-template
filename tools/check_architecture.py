@@ -20,6 +20,7 @@ COMPONENTS = {
     'motion_port': ROOT / 'components' / 'motion_port',
     'flight': ROOT / 'components' / 'flight',
     'ota': ROOT / 'components' / 'ota',
+    'image_motion': ROOT / 'components' / 'image_motion',
     'domain': ROOT / 'applications' / 'node' / 'components' / 'domain',
     'application': ROOT / 'applications' / 'node' / 'components' / 'application',
     'node_drivers': ROOT / 'applications' / 'node' / 'components' / 'node_drivers',
@@ -39,6 +40,7 @@ ALLOWED = {
     'motion_port': {'motion'},
     'flight': {'motion', 'parameters'},
     'ota': set(),
+    'image_motion': set(),
     'domain': set(),
     'application': {'domain', 'timed_output'},
     'node_drivers': {'domain', 'application'},
@@ -55,6 +57,7 @@ PORTABLE = {
     'motion',
     'flight',
     'ota',
+    'image_motion',
 }
 
 
